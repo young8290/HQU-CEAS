@@ -15,12 +15,25 @@ model User {
   role         String   @default("monitor") // "admin" | "monitor"
   classId      Int?     @map("class_id")
   displayName  String?  @map("display_name")
+  email        String?
+  lastLoginAt  DateTime? @map("last_login_at")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   class       Class?       @relation(fields: [classId], references: [id], onDelete: SetNull)
   scores      Score[]      @relation("UpdatedBy")
   importLogs  ImportLog[]
+  submittedDeclarations DeclarationBatch[] @relation("DeclarationSubmittedBy")
+  reviewedDeclarations  DeclarationBatch[] @relation("DeclarationReviewedBy")
+  checkedItems          DeclarationChecklistItem[] @relation("ChecklistCheckedBy")
+  agreementSignatures   AgreementSignature[] @relation("AgreementSignedBy")
+  storedFiles           StoredFile[] @relation("StoredFileCreatedBy")
+  signatureFiles        SignatureFile[] @relation("SignatureFileCreatedBy")
+  generatedPdfs         PdfFile[] @relation("PdfGeneratedBy")
+  auditLogs             AuditLog[] @relation("AuditLogActor")
+  mailConfigs           MailConfig[] @relation("MailConfigUpdatedBy")
+  mailTemplates         MailTemplate[] @relation("MailTemplateUpdatedBy")
+  mailLogs              MailLog[] @relation("MailLogSentBy")
 
   @@map("users")
 }
@@ -39,11 +52,18 @@ model Class {
   id        Int      @id @default(autoincrement())
   gradeId   Int      @map("grade_id")
   name      String
+  studentGroupType String @default("regular") @map("student_group_type")
+  isComputerCategory Boolean @default(false) @map("is_computer_category")
   createdAt DateTime @default(now()) @map("created_at")
 
   grade    Grade     @relation(fields: [gradeId], references: [id], onDelete: Cascade)
   students Student[]
   users    User[]
+  awardQuotas AwardQuota[]
+  classHonorRecords ClassHonorRecord[]
+  declarationBatches DeclarationBatch[]
+  scoreReviewRecords ScoreReviewRecord[]
+  tags Tag[]
 
   @@unique([gradeId, name])
   @@map("classes")
@@ -59,6 +79,10 @@ model Student {
 
   class  Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
   scores Score[]
+  externalAwardRecords ExternalAwardRecord[]
+  declarationStudents DeclarationStudent[]
+  declarationSupplements DeclarationSupplement[]
+  tags Tag[]
 
   @@map("students")
 }
@@ -70,6 +94,14 @@ model AcademicYear {
   createdAt DateTime @default(now()) @map("created_at")
 
   scores Score[]
+  importLogs ImportLog[]
+  externalAwardRecords ExternalAwardRecord[]
+  awardQuotas AwardQuota[]
+  classHonorRecords ClassHonorRecord[]
+  declarationBatches DeclarationBatch[]
+  declarationSupplements DeclarationSupplement[]
+  scoreReviewRecords ScoreReviewRecord[]
+  tags Tag[]
 
   @@map("academic_years")
 }
@@ -96,6 +128,8 @@ model ImportLog {
   id           Int      @id @default(autoincrement())
   type         String   // academic, sports, personal_form
   filename     String?
+  academicYearId Int?   @map("academic_year_id")
+  sourceType   String?  @map("source_type")
   successCount Int      @default(0) @map("success_count")
   failCount    Int      @default(0) @map("fail_count")
   failDetails  String?  @map("fail_details") // JSON string
@@ -103,6 +137,354 @@ model ImportLog {
   createdAt    DateTime @default(now()) @map("created_at")
 
   importedByUser User? @relation(fields: [importedBy], references: [id], onDelete: SetNull)
+  academicYear AcademicYear? @relation(fields: [academicYearId], references: [id], onDelete: SetNull)
+  externalAwardRecords ExternalAwardRecord[]
+  classHonorRecords ClassHonorRecord[]
 
   @@map("import_logs")
+}
+
+model ExternalAwardRecord {
+  id Int @id @default(autoincrement())
+  academicYearId Int @map("academic_year_id")
+  studentId Int @map("student_id")
+  awardType String @map("award_type")
+  awardName String @map("award_name")
+  level String?
+  sourceImportLogId Int? @map("source_import_log_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  sourceImportLog ImportLog? @relation(fields: [sourceImportLogId], references: [id], onDelete: SetNull)
+
+  @@unique([academicYearId, studentId, awardType])
+  @@map("external_award_records")
+}
+
+model AwardQuota {
+  id Int @id @default(autoincrement())
+  academicYearId Int @map("academic_year_id")
+  classId Int @map("class_id")
+  quotaCount Int @default(0) @map("quota_count")
+  availableAmount Float @default(0) @map("available_amount")
+  remark String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([academicYearId, classId])
+  @@map("award_quotas")
+}
+
+model ClassHonorRecord {
+  id Int @id @default(autoincrement())
+  academicYearId Int @map("academic_year_id")
+  classId Int @map("class_id")
+  honorType String @map("honor_type")
+  sourceImportLogId Int? @map("source_import_log_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  sourceImportLog ImportLog? @relation(fields: [sourceImportLogId], references: [id], onDelete: SetNull)
+
+  @@unique([academicYearId, classId, honorType])
+  @@map("class_honor_records")
+}
+
+model DeclarationBatch {
+  id Int @id @default(autoincrement())
+  academicYearId Int @map("academic_year_id")
+  classId Int @map("class_id")
+  declarationType String @map("declaration_type")
+  status String @default("draft")
+  submittedBy Int? @map("submitted_by")
+  submittedAt DateTime? @map("submitted_at")
+  reviewedBy Int? @map("reviewed_by")
+  reviewedAt DateTime? @map("reviewed_at")
+  reviewOpinion String? @map("review_opinion")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  submittedByUser User? @relation("DeclarationSubmittedBy", fields: [submittedBy], references: [id], onDelete: SetNull)
+  reviewedByUser User? @relation("DeclarationReviewedBy", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  students DeclarationStudent[]
+  checklistItems DeclarationChecklistItem[]
+  agreementSignatures AgreementSignature[]
+
+  @@index([academicYearId, declarationType, status])
+  @@map("declaration_batches")
+}
+
+model DeclarationStudent {
+  id Int @id @default(autoincrement())
+  batchId Int @map("batch_id")
+  studentId Int @map("student_id")
+  itemType String @map("item_type")
+  itemLevel String? @map("item_level")
+  amount Float?
+  conditionSnapshotJson String @default("{}") @map("condition_snapshot_json")
+  materialJson String @default("{}") @map("material_json")
+  status String @default("pending")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  batch DeclarationBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([batchId, studentId, itemType])
+  @@map("declaration_students")
+}
+
+model DeclarationSupplement {
+  id Int @id @default(autoincrement())
+  academicYearId Int @map("academic_year_id")
+  studentId Int @map("student_id")
+  gender String?
+  averageGpa Float? @map("average_gpa")
+  disciplinaryAction String? @map("disciplinary_action")
+  excellentStudentIntent Boolean? @map("excellent_student_intent")
+  excellentStudentRecommendationLevel String? @map("excellent_student_recommendation_level")
+  excellentCadreIntent Boolean? @map("excellent_cadre_intent")
+  excellentCadreRecommendationSource String? @map("excellent_cadre_recommendation_source")
+  excellentCadreRecommendationLevel String? @map("excellent_cadre_recommendation_level")
+  positionInfo String? @map("position_info")
+  competitionActivity String? @map("competition_activity")
+  remark String?
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([academicYearId, studentId])
+  @@map("declaration_supplements")
+}
+
+model DeclarationChecklistItem {
+  id Int @id @default(autoincrement())
+  batchId Int @map("batch_id")
+  code String
+  label String
+  checked Boolean @default(false)
+  checkedBy Int? @map("checked_by")
+  checkedAt DateTime? @map("checked_at")
+
+  batch DeclarationBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  checkedByUser User? @relation("ChecklistCheckedBy", fields: [checkedBy], references: [id], onDelete: SetNull)
+
+  @@unique([batchId, code])
+  @@map("declaration_checklist_items")
+}
+
+model AgreementSignature {
+  id Int @id @default(autoincrement())
+  batchId Int @map("batch_id")
+  agreementVersion Int @default(1) @map("agreement_version")
+  signatureFileId Int? @map("signature_file_id")
+  pdfFileId Int? @map("pdf_file_id")
+  signedBy Int? @map("signed_by")
+  signedAt DateTime? @map("signed_at")
+
+  batch DeclarationBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  signatureFile SignatureFile? @relation(fields: [signatureFileId], references: [id], onDelete: SetNull)
+  pdfFile PdfFile? @relation(fields: [pdfFileId], references: [id], onDelete: SetNull)
+  signedByUser User? @relation("AgreementSignedBy", fields: [signedBy], references: [id], onDelete: SetNull)
+
+  @@map("agreement_signatures")
+}
+
+model ScoreReviewRecord {
+  id Int @id @default(autoincrement())
+  academicYearId Int @map("academic_year_id")
+  classId Int @map("class_id")
+  status String @default("draft")
+  pdfFileId Int? @map("pdf_file_id")
+  completedAt DateTime? @map("completed_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  pdfFile PdfFile? @relation(fields: [pdfFileId], references: [id], onDelete: SetNull)
+  members ScoreReviewGroupMember[]
+
+  @@unique([academicYearId, classId])
+  @@map("score_review_records")
+}
+
+model ScoreReviewGroupMember {
+  id Int @id @default(autoincrement())
+  recordId Int @map("record_id")
+  name String
+  roleName String? @map("role_name")
+  sortOrder Int @default(0) @map("sort_order")
+  signatureFileId Int? @map("signature_file_id")
+  signedAt DateTime? @map("signed_at")
+
+  record ScoreReviewRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  signatureFile SignatureFile? @relation(fields: [signatureFileId], references: [id], onDelete: SetNull)
+
+  @@map("score_review_group_members")
+}
+
+model StoredFile {
+  id Int @id @default(autoincrement())
+  fileName String @map("file_name")
+  fileType String @map("file_type")
+  mimeType String @map("mime_type")
+  storageKey String @unique @map("storage_key")
+  sha256 String
+  size Int
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  createdByUser User? @relation("StoredFileCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  originalSignatureFiles SignatureFile[] @relation("OriginalSignatureFile")
+  croppedSignatureFiles SignatureFile[] @relation("CroppedSignatureFile")
+  pdfFiles PdfFile[]
+
+  @@map("stored_files")
+}
+
+model SignatureFile {
+  id Int @id @default(autoincrement())
+  signerName String @map("signer_name")
+  method String
+  purpose String
+  originalFileId Int? @map("original_file_id")
+  croppedFileId Int? @map("cropped_file_id")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  originalFile StoredFile? @relation("OriginalSignatureFile", fields: [originalFileId], references: [id], onDelete: SetNull)
+  croppedFile StoredFile? @relation("CroppedSignatureFile", fields: [croppedFileId], references: [id], onDelete: SetNull)
+  createdByUser User? @relation("SignatureFileCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  agreementSignatures AgreementSignature[]
+  scoreReviewGroupMembers ScoreReviewGroupMember[]
+
+  @@map("signature_files")
+}
+
+model PdfFile {
+  id Int @id @default(autoincrement())
+  storedFileId Int @map("stored_file_id")
+  pdfType String @map("pdf_type")
+  templateVersion Int @default(1) @map("template_version")
+  businessType String @map("business_type")
+  businessId Int @map("business_id")
+  generatedBy Int? @map("generated_by")
+  generatedAt DateTime @default(now()) @map("generated_at")
+
+  storedFile StoredFile @relation(fields: [storedFileId], references: [id], onDelete: Cascade)
+  generatedByUser User? @relation("PdfGeneratedBy", fields: [generatedBy], references: [id], onDelete: SetNull)
+  agreementSignatures AgreementSignature[]
+  scoreReviewRecords ScoreReviewRecord[]
+
+  @@index([businessType, businessId])
+  @@map("pdf_files")
+}
+
+model Tag {
+  id Int @id @default(autoincrement())
+  academicYearId Int @map("academic_year_id")
+  studentId Int? @map("student_id")
+  classId Int? @map("class_id")
+  tagType String @map("tag_type")
+  tagName String @map("tag_name")
+  sourceType String @map("source_type")
+  sourceId Int? @map("source_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  student Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class Class? @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@index([academicYearId, tagType])
+  @@map("tags")
+}
+
+model AuditLog {
+  id Int @id @default(autoincrement())
+  module String
+  action String
+  actorId Int? @map("actor_id")
+  targetType String? @map("target_type")
+  targetId Int? @map("target_id")
+  beforeJson String? @map("before_json")
+  afterJson String? @map("after_json")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  actor User? @relation("AuditLogActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([module, action, createdAt])
+  @@map("audit_logs")
+}
+
+model MailConfig {
+  id Int @id @default(autoincrement())
+  smtpHost String @map("smtp_host")
+  smtpPort Int @map("smtp_port")
+  username String
+  passwordEncrypted String @map("password_encrypted")
+  senderName String @map("sender_name")
+  enabled Boolean @default(false)
+  updatedBy Int? @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  updatedByUser User? @relation("MailConfigUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("mail_configs")
+}
+
+model MailTemplate {
+  id Int @id @default(autoincrement())
+  templateType String @map("template_type")
+  subject String
+  body String
+  variablesJson String @default("[]") @map("variables_json")
+  version Int @default(1)
+  enabled Boolean @default(true)
+  updatedBy Int? @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  updatedByUser User? @relation("MailTemplateUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([templateType, version])
+  @@map("mail_templates")
+}
+
+model MailLog {
+  id Int @id @default(autoincrement())
+  templateType String @map("template_type")
+  recipientEmail String @map("recipient_email")
+  subject String
+  contentDigest String? @map("content_digest")
+  variablesJson String? @map("variables_json")
+  status String @default("pending")
+  failureReason String? @map("failure_reason")
+  sentBy Int? @map("sent_by")
+  sentAt DateTime? @map("sent_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  sentByUser User? @relation("MailLogSentBy", fields: [sentBy], references: [id], onDelete: SetNull)
+
+  @@index([templateType, status, createdAt])
+  @@map("mail_logs")
+}
+
+model SystemSetting {
+  id Int @id @default(autoincrement())
+  key String @unique
+  valueJson String @map("value_json")
+  updatedBy Int? @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
 }

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const defaultDescription = '计算机科学与技术学院学生素质综合测评填写系统';
+const defaultDescription = '计算机科学与技术学院综测填写、奖学金申报和荣誉称号申报系统';
 
 export function usePageMeta(title: string, description = defaultDescription) {
   useEffect(() => {

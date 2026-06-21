@@ -7,6 +7,7 @@ export default function StudentsRoute() {
       title="学生管理 - 综测填写系统"
       maxWidthClass="max-w-7xl"
       adminOnly
+      scope="evaluation"
     >
       <StudentsPage />
     </AppShell>

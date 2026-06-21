@@ -1,6 +1,6 @@
 import prisma from '../config/database.js';
 import ExcelJS from 'exceljs';
-import { calculateAcademicScore, calculateSportsBaseScore } from '../utils/calculation.js';
+import { calculateAcademicScore, calculateSportsBaseScore, type GradeStage } from '../utils/calculation.js';
 import * as scoreService from './scoreService.js';
 
 // Safely read cell value as string (handles null, number, richText, formula)
@@ -15,6 +15,50 @@ function cellText(cell: ExcelJS.Cell): string {
     return r != null ? String(r).trim() : '';
   }
   return String(v).trim();
+}
+
+export function resolveGradeStage(stageText: string): GradeStage {
+  const normalized = stageText.trim().toLowerCase();
+  if (normalized.includes('大三') || normalized.includes('三') || normalized === 'junior') {
+    return 'junior';
+  }
+  if (normalized.includes('大二') || normalized.includes('二') || normalized === 'sophomore') {
+    return 'sophomore';
+  }
+  return 'freshman';
+}
+
+export function readSportsImportRow(data: {
+  studentNo: string;
+  name: string;
+  physicalTestScore: string;
+  peCourseScore: string;
+  gradeStage: string;
+  communityScore: string;
+}) {
+  const physicalTestScore = parseFloat(data.physicalTestScore);
+  if (Number.isNaN(physicalTestScore)) {
+    throw new Error(`体测成绩无效: ${data.physicalTestScore}`);
+  }
+
+  const peCourseScore = data.peCourseScore ? parseFloat(data.peCourseScore) : undefined;
+  if (data.peCourseScore && Number.isNaN(peCourseScore)) {
+    throw new Error(`体育课成绩无效: ${data.peCourseScore}`);
+  }
+
+  const communityScore = data.communityScore ? parseFloat(data.communityScore) : undefined;
+  if (data.communityScore && Number.isNaN(communityScore)) {
+    throw new Error(`社区表现分无效: ${data.communityScore}`);
+  }
+
+  return {
+    studentNo: data.studentNo,
+    name: data.name,
+    physicalTestScore,
+    peCourseScore,
+    gradeStage: resolveGradeStage(data.gradeStage),
+    communityScore,
+  };
 }
 
 export async function importAcademicScores(buffer: Buffer, academicYearId: number, userId: number, classId?: number) {
@@ -99,17 +143,22 @@ export async function importSportsScores(buffer: Buffer, academicYearId: number,
     const row = worksheet.getRow(rowNum);
     const studentNo = cellText(row.getCell(1));
     const name = cellText(row.getCell(2));
-    const baseStr = cellText(row.getCell(8));
+    const physicalTestStr = cellText(row.getCell(3)) || cellText(row.getCell(8));
+    const peCourseStr = cellText(row.getCell(4));
+    const gradeStageText = cellText(row.getCell(5));
+    const communityScoreStr = cellText(row.getCell(6));
 
     if (!studentNo) continue;
 
     try {
-      const rawBase = parseFloat(baseStr);
-      if (isNaN(rawBase)) {
-        failCount++;
-        failures.push({ row: rowNum, studentNo, name, reason: `基础分无效: ${baseStr}` });
-        continue;
-      }
+      const imported = readSportsImportRow({
+        studentNo,
+        name,
+        physicalTestScore: physicalTestStr,
+        peCourseScore: peCourseStr,
+        gradeStage: gradeStageText,
+        communityScore: communityScoreStr,
+      });
 
       const student = await prisma.student.findUnique({ where: { studentNo } });
       if (!student) {
@@ -122,7 +171,36 @@ export async function importSportsScores(buffer: Buffer, academicYearId: number,
         continue; // Skip students not in the target class
       }
 
-      const sportsBase = calculateSportsBaseScore(rawBase);
+      const sportsBase = calculateSportsBaseScore({
+        gradeStage: imported.gradeStage,
+        physicalTestScore: imported.physicalTestScore,
+        peCourseScore: imported.peCourseScore,
+      });
+      await scoreService.updateScore({
+        studentId: student.id,
+        academicYearId,
+        category: 'physical_test',
+        value: imported.physicalTestScore,
+        updatedBy: userId,
+      });
+      if (imported.peCourseScore !== undefined) {
+        await scoreService.updateScore({
+          studentId: student.id,
+          academicYearId,
+          category: 'pe_course',
+          value: imported.peCourseScore,
+          updatedBy: userId,
+        });
+      }
+      if (imported.communityScore !== undefined) {
+        await scoreService.updateScore({
+          studentId: student.id,
+          academicYearId,
+          category: 'community',
+          value: imported.communityScore,
+          updatedBy: userId,
+        });
+      }
       await scoreService.updateScore({
         studentId: student.id,
         academicYearId,
@@ -142,6 +220,8 @@ export async function importSportsScores(buffer: Buffer, academicYearId: number,
     data: {
       type: 'sports',
       filename: 'sports_import.xlsx',
+      academicYearId,
+      sourceType: 'sports_extended',
       successCount,
       failCount,
       failDetails: JSON.stringify(failures),
@@ -174,6 +254,8 @@ export async function importPersonalFormMultiple(files: { buffer: Buffer; origin
     data: {
       type: 'personal_form',
       filename: files.length === 1 ? files[0].originalname : `${files.length}个文件批量导入`,
+      academicYearId,
+      sourceType: 'personal_form',
       successCount: totalSuccess,
       failCount: totalFail,
       failDetails: JSON.stringify(allFailures),
@@ -214,7 +296,7 @@ export async function importPersonalForm(buffer: Buffer, academicYearId: number,
       const studentNo = cellText(worksheet.getCell('B1'));
       const studentName = cellText(worksheet.getCell('D1'));
 
-      if (!studentNo || studentNo === '学号填这里') {
+      if (!studentNo || ['学号填这里', '这里填学号'].includes(studentNo)) {
         // Skip template placeholder sheets silently
         continue;
       }

@@ -2,8 +2,10 @@ import { Router, Request, Response } from 'express';
 import { authMiddleware, adminOnly } from '../middleware/auth.js';
 import * as userService from '../services/userService.js';
 import * as exportService from '../services/exportService.js';
+import multer from 'multer';
 
 const router = Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authMiddleware);
 
@@ -19,9 +21,30 @@ router.get('/', adminOnly, async (req: Request, res: Response) => {
 
 router.post('/', adminOnly, async (req: Request, res: Response) => {
   try {
-    const { username, password, role, classId, displayName } = req.body;
-    const user = await userService.createUser({ username, password, role, classId, displayName });
+    const { username, password, role, classId, displayName, email } = req.body;
+    const user = await userService.createUser({ username, password, role, classId, displayName, email });
     res.json({ id: user.id, username: user.username });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.put('/:id/email', adminOnly, async (req: Request, res: Response) => {
+  try {
+    const user = await userService.updateUserEmail(parseInt(req.params.id as string), req.body.email || null);
+    res.json(user);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.post('/monitor-emails/import', adminOnly, upload.single('file'), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) throw new Error('请上传文件');
+    res.json(await userService.importMonitorEmails({
+      buffer: req.file.buffer,
+      actorId: req.user!.userId,
+    }));
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }

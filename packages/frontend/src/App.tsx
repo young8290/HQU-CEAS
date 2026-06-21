@@ -1,26 +1,54 @@
 import RouteErrorBoundary from './components/common/RouteErrorBoundary';
 import type { ComponentType } from 'react';
 import AccountsRoute from './routes/AccountsRoute';
+import AuditLogsRoute from './routes/AuditLogsRoute';
+import AwardsRoute from './routes/AwardsRoute';
 import DashboardRoute from './routes/DashboardRoute';
+import DeclarationExportRoute from './routes/DeclarationExportRoute';
+import DeclarationImportRoute from './routes/DeclarationImportRoute';
+import DeclarationReviewsRoute from './routes/DeclarationReviewsRoute';
 import ExportRoute from './routes/ExportRoute';
+import HonorsRoute from './routes/HonorsRoute';
 import ImportRoute from './routes/ImportRoute';
 import LoginRoute from './routes/LoginRoute';
+import MailRoute from './routes/MailRoute';
+import MailTemplateRoute from './routes/MailTemplateRoute';
+import MonitorDashboardRoute from './routes/MonitorDashboardRoute';
+import MonitorScoresRoute from './routes/MonitorScoresRoute';
 import NotFoundRoute from './routes/NotFoundRoute';
 import RootRoute from './routes/RootRoute';
 import ScoresRoute from './routes/ScoresRoute';
 import SettingsRoute from './routes/SettingsRoute';
 import StudentsRoute from './routes/StudentsRoute';
+import SubmissionsRoute from './routes/SubmissionsRoute';
+import SystemEntryRoute from './routes/SystemEntryRoute';
+import TagsRoute from './routes/TagsRoute';
 import { useCurrentPath } from './lib/router';
 
 const routes: Record<string, ComponentType> = {
   '/': RootRoute,
   '/login': LoginRoute,
+  '/entry': SystemEntryRoute,
   '/dashboard': DashboardRoute,
+  '/monitor/dashboard': MonitorDashboardRoute,
   '/scores': ScoresRoute,
+  '/monitor/scores': MonitorScoresRoute,
   '/students': StudentsRoute,
   '/import': ImportRoute,
   '/export': ExportRoute,
   '/accounts': AccountsRoute,
+  '/awards': AwardsRoute,
+  '/monitor/awards': AwardsRoute,
+  '/honors': HonorsRoute,
+  '/monitor/honors': HonorsRoute,
+  '/declaration-reviews': DeclarationReviewsRoute,
+  '/declaration-import': DeclarationImportRoute,
+  '/declaration-export': DeclarationExportRoute,
+  '/monitor/submissions': SubmissionsRoute,
+  '/tags': TagsRoute,
+  '/audit-logs': AuditLogsRoute,
+  '/accounts-mail': MailRoute,
+  '/mail-templates': MailTemplateRoute,
   '/settings': SettingsRoute,
 };
 

@@ -15,6 +15,11 @@ export default function SettingsPage() {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [entryStatus, setEntryStatus] = useState({
+    comprehensiveEvalOpen: true,
+    declarationOpen: true,
+    declarationCloseReason: '',
+  });
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(true);
@@ -24,6 +29,13 @@ export default function SettingsPage() {
 
   useEffect(() => {
     loadYears();
+    if (isAdmin) {
+      api.get('/system/settings')
+        .then((data) => {
+          if (data.entryStatus) setEntryStatus(data.entryStatus);
+        })
+        .catch(() => undefined);
+    }
   }, []);
 
   const loadYears = async () => {
@@ -88,6 +100,16 @@ export default function SettingsPage() {
     }
   };
 
+  const handleSaveEntryStatus = async () => {
+    try {
+      await api.put('/system/settings', { entryStatus });
+      setSuccessMsg('系统开放状态已保存');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err: any) {
+      setError(err.message || '保存失败');
+    }
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-64"><div className="text-neutral-400">加载中...</div></div>;
   }
@@ -101,12 +123,12 @@ export default function SettingsPage() {
 
       {/* Messages */}
       {successMsg && (
-        <div className="px-4 py-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 text-sm">
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
           {successMsg}
         </div>
       )}
       {error && (
-        <div className="px-4 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
           {error}
           <button onClick={() => setError('')} className="ml-2 text-red-500 hover:text-red-700">✕</button>
         </div>
@@ -114,7 +136,7 @@ export default function SettingsPage() {
 
       {/* Academic Year Management */}
       {isAdmin && (
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6">
+        <div className="rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-6 dark:border-neutral-800 dark:bg-neutral-900">
           <h2 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-4">学年管理</h2>
 
           {/* Current years list */}
@@ -122,10 +144,10 @@ export default function SettingsPage() {
             {years.map((year) => (
               <div
                 key={year.id}
-                className={`flex items-center justify-between p-3 rounded-xl border ${
+                className={`flex items-center justify-between rounded-md border p-3 ${
                   year.isCurrent
-                    ? 'border-primary-300 dark:border-primary-700 bg-primary-50 dark:bg-primary-500/10'
-                    : 'border-neutral-200 dark:border-neutral-700'
+                    ? 'border-[#9a5b3d] bg-white dark:border-primary-700 dark:bg-primary-500/10'
+                    : 'border-[#ded6c8] bg-white dark:border-neutral-700 dark:bg-neutral-950'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -157,12 +179,12 @@ export default function SettingsPage() {
               type="text"
               value={newYearName}
               onChange={(e) => setNewYearName(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              className="flex-1 rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
               placeholder="学年名称，如：2025-2026学年"
             />
             <button
               onClick={handleCreateYear}
-              className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm hover:bg-primary-600 transition-colors"
+              className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white transition-colors hover:bg-[#7c4a34]"
             >
               创建
             </button>
@@ -170,8 +192,50 @@ export default function SettingsPage() {
         </div>
       )}
 
+      {isAdmin && (
+        <div className="rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-6 dark:border-neutral-800 dark:bg-neutral-900">
+          <h2 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-4">系统开放状态</h2>
+          <div className="space-y-4">
+            <label className="flex items-center gap-3 text-sm text-neutral-700 dark:text-neutral-300">
+              <input
+                type="checkbox"
+                checked={entryStatus.comprehensiveEvalOpen}
+                onChange={(event) => setEntryStatus({ ...entryStatus, comprehensiveEvalOpen: event.target.checked })}
+                className="h-4 w-4 accent-primary-600"
+              />
+              综合素质测评填写系统开放
+            </label>
+            <label className="flex items-center gap-3 text-sm text-neutral-700 dark:text-neutral-300">
+              <input
+                type="checkbox"
+                checked={entryStatus.declarationOpen}
+                onChange={(event) => setEntryStatus({ ...entryStatus, declarationOpen: event.target.checked })}
+                className="h-4 w-4 accent-primary-600"
+              />
+              奖学金与荣誉称号申报系统开放
+            </label>
+            <label className="block text-sm">
+              <span className="text-neutral-700 dark:text-neutral-300">申报系统关闭说明</span>
+              <textarea
+                value={entryStatus.declarationCloseReason}
+                onChange={(event) => setEntryStatus({ ...entryStatus, declarationCloseReason: event.target.value })}
+                rows={3}
+                className="mt-1 w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={handleSaveEntryStatus}
+              className="rounded-md bg-[#9a5b3d] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#7c4a34]"
+            >
+              保存开放状态
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Change Password */}
-      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6">
+      <div className="rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-6 dark:border-neutral-800 dark:bg-neutral-900">
         <h2 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-4">修改密码</h2>
         <div className="space-y-4">
           <div>
@@ -180,7 +244,7 @@ export default function SettingsPage() {
               type="password"
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
             />
           </div>
           <div>
@@ -189,7 +253,7 @@ export default function SettingsPage() {
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
             />
           </div>
           <div>
@@ -198,12 +262,12 @@ export default function SettingsPage() {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
             />
           </div>
           <button
             onClick={handleChangePassword}
-            className="px-6 py-2.5 rounded-xl bg-primary-500 text-white font-medium hover:bg-primary-600 transition-colors"
+            className="rounded-md bg-[#9a5b3d] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#7c4a34]"
           >
             修改密码
           </button>
@@ -211,7 +275,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Account Info */}
-      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6">
+      <div className="rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-6 dark:border-neutral-800 dark:bg-neutral-900">
         <h2 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-4">账号信息</h2>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between py-2 border-b border-neutral-100 dark:border-neutral-800">

@@ -106,7 +106,7 @@ export async function updateScore(data: {
   });
 
   // If sports_base or sports_reward changed, recalculate sports_total
-  if (data.category === 'sports_base' || data.category === 'sports_reward') {
+  if (['sports_base', 'sports_reward', 'physical_test', 'pe_course'].includes(data.category)) {
     await recalculateSportsTotal(data.studentId, data.academicYearId, data.updatedBy);
   }
 

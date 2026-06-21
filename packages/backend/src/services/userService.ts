@@ -1,5 +1,17 @@
 import prisma from '../config/database.js';
 import { hashPassword, generateRandomPassword } from '../utils/password.js';
+import { createFailedMailLog, sendTemplateMail } from './mailService.js';
+import ExcelJS from 'exceljs';
+
+const DEFAULT_SYSTEM_LINK = 'http://localhost:3000';
+
+function cellText(cell: ExcelJS.Cell): string {
+  const value = cell.value;
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'object' && 'text' in value) return String((value as any).text ?? '').trim();
+  if (typeof value === 'object' && 'result' in value) return String((value as any).result ?? '').trim();
+  return String(value).trim();
+}
 
 export async function listUsers(filters?: { role?: string }) {
   const where: any = {};
@@ -12,6 +24,8 @@ export async function listUsers(filters?: { role?: string }) {
       username: true,
       role: true,
       displayName: true,
+      email: true,
+      lastLoginAt: true,
       classId: true,
       createdAt: true,
       class: {
@@ -31,6 +45,7 @@ export async function createUser(data: {
   role: string;
   classId?: number;
   displayName?: string;
+  email?: string;
 }) {
   const passwordHash = await hashPassword(data.password);
   return prisma.user.create({
@@ -40,6 +55,7 @@ export async function createUser(data: {
       role: data.role,
       classId: data.classId,
       displayName: data.displayName,
+      email: data.email,
     },
   });
 }
@@ -56,6 +72,19 @@ export async function resetPassword(id: number) {
     data: { passwordHash },
   });
   return { newPassword };
+}
+
+export async function updateUserEmail(id: number, email: string | null) {
+  return prisma.user.update({
+    where: { id },
+    data: { email },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      displayName: true,
+    },
+  });
 }
 
 export async function batchGenerateMonitors(options: {
@@ -131,4 +160,124 @@ export async function batchGenerateMonitors(options: {
   }
 
   return results;
+}
+
+export function buildMonitorAccountMailVariables(data: {
+  gradeName: string;
+  className: string;
+  displayName: string;
+  username: string;
+  password: string;
+  systemLink?: string;
+}) {
+  return {
+    班级: `${data.gradeName}${data.className}`,
+    班长姓名: data.displayName,
+    登录账号: data.username,
+    初始密码: data.password,
+    系统链接: data.systemLink || DEFAULT_SYSTEM_LINK,
+  };
+}
+
+export async function sendMonitorAccountMails(data: {
+  accounts: Array<{
+    gradeName: string;
+    className: string;
+    username: string;
+    password: string;
+    displayName: string;
+  }>;
+  actorId?: number;
+  systemLink?: string;
+}) {
+  const results = [];
+
+  for (const account of data.accounts) {
+    const user = await prisma.user.findUnique({ where: { username: account.username } });
+    if (!user?.email) {
+      const variables = buildMonitorAccountMailVariables({
+        ...account,
+        systemLink: data.systemLink,
+      });
+      const mailLog = await createFailedMailLog({
+        templateType: 'monitor_account',
+        recipientEmail: '',
+        subject: '班长账号通知',
+        body: `班级：${variables.班级}\n登录账号：${variables.登录账号}`,
+        variables,
+        failureReason: '班长邮箱未配置',
+        actorId: data.actorId,
+      });
+      results.push({
+        username: account.username,
+        status: 'failed',
+        reason: mailLog.failureReason,
+        mailLogId: mailLog.id,
+      });
+      continue;
+    }
+
+    const mail = await sendTemplateMail({
+      templateType: 'monitor_account',
+      recipientEmail: user.email,
+      variables: buildMonitorAccountMailVariables({
+        ...account,
+        systemLink: data.systemLink,
+      }),
+      actorId: data.actorId,
+    });
+    results.push({
+      username: account.username,
+      recipientEmail: user.email,
+      status: mail.status,
+      mailLogId: mail.id,
+    });
+  }
+
+  return results;
+}
+
+export async function importMonitorEmails(data: {
+  buffer: Buffer;
+  actorId?: number;
+}) {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(data.buffer as any);
+  const worksheet = workbook.worksheets[0];
+  if (!worksheet) throw new Error('Excel文件中没有工作表');
+
+  let successCount = 0;
+  const failures: Array<{ row: number; className: string; reason: string }> = [];
+
+  for (let rowNum = 2; rowNum <= worksheet.rowCount; rowNum += 1) {
+    const row = worksheet.getRow(rowNum);
+    const gradeName = cellText(row.getCell(1));
+    const className = cellText(row.getCell(2));
+    const email = cellText(row.getCell(4));
+    if (!gradeName && !className && !email) continue;
+
+    try {
+      if (!email) throw new Error('邮箱为空');
+      const cls = await prisma.class.findFirst({
+        where: { name: className, grade: { name: gradeName } },
+        include: { users: { where: { role: 'monitor' } } },
+      });
+      if (!cls) throw new Error('班级不存在');
+      const monitor = cls.users[0];
+      if (!monitor) throw new Error('班长账号不存在');
+      await prisma.user.update({
+        where: { id: monitor.id },
+        data: { email },
+      });
+      successCount += 1;
+    } catch (error: any) {
+      failures.push({ row: rowNum, className: `${gradeName}${className}`, reason: error.message });
+    }
+  }
+
+  return {
+    successCount,
+    failCount: failures.length,
+    failures,
+  };
 }

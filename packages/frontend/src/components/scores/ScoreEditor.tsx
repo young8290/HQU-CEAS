@@ -137,12 +137,12 @@ export default function ScoreEditor({ classId, onBack }: Props) {
             placeholder="搜索学生..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-3 py-1.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
+            className="rounded-md border border-[#d8c9b8] bg-white px-3 py-1.5 text-sm text-neutral-950 focus:border-[#9a5b3d] focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:focus:border-primary-500"
           />
 
           <button
             onClick={() => loadScores()}
-            className="px-3 py-1.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+            className="rounded-md border border-[#d8c9b8] bg-white px-3 py-1.5 text-sm text-neutral-700 transition-colors hover:bg-[#f6f1e8] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
           >
             刷新
           </button>
@@ -150,7 +150,7 @@ export default function ScoreEditor({ classId, onBack }: Props) {
       </div>
 
       {/* Score table */}
-      <div className="overflow-x-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+      <div className="overflow-x-auto rounded-lg border border-[#ded6c8] bg-white dark:border-neutral-800 dark:bg-neutral-900">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
@@ -280,27 +280,27 @@ export default function ScoreEditor({ classId, onBack }: Props) {
       {/* Remark modal */}
       {editingRemark && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setEditingRemark(null)}>
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 w-96 shadow-xl border border-neutral-200 dark:border-neutral-800" onClick={(e) => e.stopPropagation()}>
+          <div className="w-96 rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-3">
               编辑备注 - {SCORE_RULES[editingRemark.category as keyof typeof SCORE_RULES]?.label || editingRemark.category}
             </h3>
             <textarea
               value={remarkText}
               onChange={(e) => setRemarkText(e.target.value)}
-              className="w-full h-24 px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white resize-none focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
+              className="h-24 w-full resize-none rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:border-[#9a5b3d] focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:focus:border-primary-500"
               placeholder="输入备注..."
               autoFocus
             />
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setEditingRemark(null)}
-                className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 transition-colors hover:bg-[#f6f1e8] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
               >
                 取消
               </button>
               <button
                 onClick={() => handleRemarkSave(editingRemark.studentId, editingRemark.category)}
-                className="px-4 py-2 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+                className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white transition-colors hover:bg-[#7c4a34]"
               >
                 保存
               </button>

@@ -10,6 +10,14 @@ const CACHE_RULES = [
   { pattern: /^\/users$/, ttl: 60 * 1000 },
   { pattern: /^\/students\?classId=\d+$/, ttl: 30 * 1000 },
   { pattern: /^\/import\/logs$/, ttl: 20 * 1000 },
+  { pattern: /^\/system\/entry-status$/, ttl: 15 * 1000 },
+  { pattern: /^\/templates$/, ttl: 5 * 60 * 1000 },
+  { pattern: /^\/awards\/candidates\/\d+/, ttl: 30 * 1000 },
+  { pattern: /^\/awards\/allocation\/\d+/, ttl: 30 * 1000 },
+  { pattern: /^\/honors\/candidates\/\d+/, ttl: 30 * 1000 },
+  { pattern: /^\/declaration-reviews/, ttl: 15 * 1000 },
+  { pattern: /^\/mail\/templates$/, ttl: 5 * 60 * 1000 },
+  { pattern: /^\/tags/, ttl: 30 * 1000 },
 ] as const;
 
 const memoryCache = new Map<string, { data: any; expiresAt: number }>();
@@ -166,7 +174,7 @@ async function request<T = any>(path: string, options: RequestOptions = {}): Pro
 
     // Check if response is a file download
     const contentType = res.headers.get('content-type') || '';
-    if (contentType.includes('spreadsheet') || contentType.includes('zip')) {
+    if (contentType.includes('spreadsheet') || contentType.includes('zip') || contentType.includes('pdf')) {
       if (!res.ok) throw new Error('下载失败');
       const blob = await res.blob();
       return blob as any;

@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { getUser, clearAuth, type User } from '../../lib/auth';
 import { AppLink, navigateTo, useCurrentPath } from '../../lib/router';
+import type { SystemScope } from './AppShell';
 
 // SVG Icon components
 const IconDashboard = () => (
@@ -46,6 +47,20 @@ const IconSettings = () => (
   </svg>
 );
 
+const IconDeclaration = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+    <path d="M8 7h8M8 11h8M8 15h5" />
+    <path d="M5 3h14a1 1 0 0 1 1 1v16l-4-2-4 2-4-2-4 2V4a1 1 0 0 1 1-1Z" />
+  </svg>
+);
+
+const IconMail = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+    <path d="M4 6h16v12H4z" />
+    <path d="m4 7 8 6 8-6" />
+  </svg>
+);
+
 const IconLogout = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
     <path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3-3h-12m12 0-3-3m3 3-3 3" />
@@ -56,20 +71,35 @@ interface NavItem {
   name: string;
   href: string;
   icon: ReactNode;
+  scope: SystemScope;
   adminOnly?: boolean;
+  monitorOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
-  { name: '仪表盘', href: '/dashboard', icon: <IconDashboard /> },
-  { name: '分数管理', href: '/scores', icon: <IconScores /> },
-  { name: '学生管理', href: '/students', icon: <IconStudents />, adminOnly: true },
-  { name: '数据导入', href: '/import', icon: <IconImport /> },
-  { name: '附件导出', href: '/export', icon: <IconExport /> },
-  { name: '账号管理', href: '/accounts', icon: <IconAccounts />, adminOnly: true },
-  { name: '系统设置', href: '/settings', icon: <IconSettings /> },
+  { name: '系统入口', href: '/entry', icon: <IconDashboard />, scope: 'shared' },
+  { name: '综测总览', href: '/dashboard', icon: <IconDashboard />, scope: 'evaluation', adminOnly: true },
+  { name: '本班综测总览', href: '/monitor/dashboard', icon: <IconDashboard />, scope: 'evaluation', monitorOnly: true },
+  { name: '分数管理', href: '/scores', icon: <IconScores />, scope: 'evaluation', adminOnly: true },
+  { name: '本班综测', href: '/monitor/scores', icon: <IconScores />, scope: 'evaluation', monitorOnly: true },
+  { name: '学生管理', href: '/students', icon: <IconStudents />, scope: 'evaluation', adminOnly: true },
+  { name: '数据导入', href: '/import', icon: <IconImport />, scope: 'evaluation' },
+  { name: '附件导出', href: '/export', icon: <IconExport />, scope: 'evaluation' },
+  { name: '申报审核', href: '/declaration-reviews', icon: <IconDeclaration />, scope: 'declaration', adminOnly: true },
+  { name: '申报数据导入', href: '/declaration-import', icon: <IconImport />, scope: 'declaration' },
+  { name: '申报材料导出', href: '/declaration-export', icon: <IconExport />, scope: 'declaration', adminOnly: true },
+  { name: '奖学金申报', href: '/monitor/awards', icon: <IconDeclaration />, scope: 'declaration', monitorOnly: true },
+  { name: '荣誉称号', href: '/monitor/honors', icon: <IconDeclaration />, scope: 'declaration', monitorOnly: true },
+  { name: '提交记录', href: '/monitor/submissions', icon: <IconDeclaration />, scope: 'declaration', monitorOnly: true },
+  { name: '标签视图', href: '/tags', icon: <IconDeclaration />, scope: 'declaration', adminOnly: true },
+  { name: '账号管理', href: '/accounts', icon: <IconAccounts />, scope: 'declaration', adminOnly: true },
+  { name: '邮箱配置', href: '/accounts-mail', icon: <IconMail />, scope: 'declaration', adminOnly: true },
+  { name: '邮件模板', href: '/mail-templates', icon: <IconMail />, scope: 'declaration', adminOnly: true },
+  { name: '操作日志', href: '/audit-logs', icon: <IconDeclaration />, scope: 'declaration', adminOnly: true },
+  { name: '系统设置', href: '/settings', icon: <IconSettings />, scope: 'shared' },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ scope }: { scope: SystemScope }) {
   const [user, setUser] = useState<User | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const currentPath = useCurrentPath();
@@ -85,6 +115,9 @@ export default function Sidebar() {
 
   const filteredItems = navItems.filter((item) => {
     if (item.adminOnly && user?.role !== 'admin') return false;
+    if (item.monitorOnly && user?.role !== 'monitor') return false;
+    if (scope === 'shared') return item.scope === 'shared';
+    if (item.scope !== 'shared' && item.scope !== scope) return false;
     return true;
   });
 
@@ -94,77 +127,86 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={`h-screen bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col transition-all duration-300 flex-shrink-0 ${collapsed ? 'w-16' : 'w-64'}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-200 dark:border-neutral-800">
-        {!collapsed ? (
-          <div className="flex items-center gap-2">
-            <img src="/学院logo.png" alt="学院logo" width="32" height="32" decoding="async" className="w-8 h-8 rounded-lg object-contain" />
-            <span className="font-headings font-medium text-neutral-950 dark:text-white text-sm">综测填写系统</span>
-          </div>
-        ) : (
-          <img src="/学院logo.png" alt="学院logo" width="32" height="32" decoding="async" className="w-8 h-8 rounded-lg object-contain" />
-        )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 cursor-pointer"
-        >
-          {collapsed ? '→' : '←'}
-        </button>
-      </div>
+    <aside className={`h-screen flex-shrink-0 border-r border-[#ded6c8] bg-[#fffaf2] transition-all duration-300 dark:border-neutral-800 dark:bg-neutral-900 ${collapsed ? 'w-16' : 'w-64'}`}>
+      <div className="flex h-full flex-col">
+        <div className="flex h-16 items-center justify-between border-b border-[#ded6c8] px-4 dark:border-neutral-800">
+          {!collapsed ? (
+            <div className="flex items-center gap-2">
+              <img src="/学院logo.png" alt="学院logo" width="32" height="32" decoding="async" className="h-8 w-8 rounded-md object-contain" />
+              <div>
+                <span className="block text-sm font-semibold text-neutral-950 dark:text-white">{systemName[scope]}</span>
+                <span className="block text-[11px] text-neutral-500 dark:text-neutral-400">{user?.role === 'admin' ? '管理员端' : '班长端'}</span>
+              </div>
+            </div>
+          ) : (
+            <img src="/学院logo.png" alt="学院logo" width="32" height="32" decoding="async" className="h-8 w-8 rounded-md object-contain" />
+          )}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            aria-label={collapsed ? '展开侧边栏' : '收起侧边栏'}
+            className="cursor-pointer rounded-md p-1.5 text-neutral-500 hover:bg-[#f1e5d4] dark:hover:bg-neutral-800"
+          >
+            {collapsed ? '>' : '<'}
+          </button>
+        </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 py-4 overflow-y-auto">
-        <ul className="space-y-1 px-2">
-          {filteredItems.map((item) => {
-            const isActive = currentPath.startsWith(item.href);
-            return (
-              <li key={item.href}>
-                <AppLink
-                  to={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors duration-200 ${
-                    isActive
-                      ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 font-medium'
-                      : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                  }`}
-                >
-                  <span className="flex-shrink-0">{item.icon}</span>
-                  {!collapsed && <span>{item.name}</span>}
-                </AppLink>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+        <nav className="flex-1 overflow-y-auto py-4">
+          <ul className="space-y-1 px-2">
+            {filteredItems.map((item) => {
+              const isActive = currentPath === item.href || currentPath.startsWith(`${item.href}/`);
+              return (
+                <li key={item.href}>
+                  <AppLink
+                    to={item.href}
+                    className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors duration-200 ${
+                      isActive
+                        ? 'bg-[#ead9c7] text-[#7c4a34] dark:bg-primary-500/10 dark:text-primary-300 font-medium'
+                        : 'text-neutral-600 hover:bg-[#f1e5d4] dark:text-neutral-400 dark:hover:bg-neutral-800'
+                    }`}
+                  >
+                    <span className="flex-shrink-0">{item.icon}</span>
+                    {!collapsed && <span>{item.name}</span>}
+                  </AppLink>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
-      {/* User info */}
-      <div className="border-t border-neutral-200 dark:border-neutral-800 p-4">
-        {!collapsed && user && (
-          <div className="mb-3">
-            <p className="text-sm font-medium text-neutral-950 dark:text-white truncate">
-              {user.displayName || user.username}
-            </p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">
-              {user.role === 'admin' ? '管理员' : user.className || '班长'}
-            </p>
-          </div>
-        )}
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-sm text-neutral-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
-        >
-          <IconLogout />
-          {!collapsed && <span>退出登录</span>}
-        </button>
-        {!collapsed && (
-          <div className="mt-3 flex flex-col items-center gap-1">
-            <img src="/学术部logo.png" alt="学术部logo" width="40" height="40" decoding="async" className="w-10 h-10 object-contain opacity-60" />
-            <p className="text-[10px] text-neutral-400 dark:text-neutral-600 text-center leading-tight">
-              计算机科学与技术学院<br />学术部制作
-            </p>
-          </div>
-        )}
+        <div className="border-t border-[#ded6c8] p-4 dark:border-neutral-800">
+          {!collapsed && user && (
+            <div className="mb-3">
+              <p className="text-sm font-medium text-neutral-950 dark:text-white truncate">
+                {user.displayName || user.username}
+              </p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {user.role === 'admin' ? '管理员' : user.className || '班长'}
+              </p>
+            </div>
+          )}
+          <button
+            onClick={handleLogout}
+            className="flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+          >
+            <IconLogout />
+            {!collapsed && <span>退出登录</span>}
+          </button>
+          {!collapsed && (
+            <div className="mt-3 flex flex-col items-center gap-1">
+              <img src="/学术部logo.png" alt="学术部logo" width="40" height="40" decoding="async" className="w-10 h-10 object-contain opacity-60" />
+              <p className="text-[10px] text-neutral-400 dark:text-neutral-600 text-center leading-tight">
+                计算机科学与技术学院<br />学术部制作
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </aside>
   );
 }
+
+const systemName: Record<SystemScope, string> = {
+  evaluation: '综测系统',
+  declaration: '申报系统',
+  shared: '系统入口',
+};

@@ -6,6 +6,7 @@ interface UserAccount {
   username: string;
   displayName: string;
   role: string;
+  email?: string | null;
   grade?: { name: string } | null;
   class?: { name: string } | null;
   createdAt: string;
@@ -41,6 +42,7 @@ export default function AccountsPage() {
   const [adminPassword, setAdminPassword] = useState('');
   const [adminDisplayName, setAdminDisplayName] = useState('');
   const [creatingAdmin, setCreatingAdmin] = useState(false);
+  const [emailDrafts, setEmailDrafts] = useState<Record<number, string>>({});
 
   useEffect(() => {
     loadUsers();
@@ -51,6 +53,11 @@ export default function AccountsPage() {
     try {
       const data = await api.get('/users');
       setUsers(data);
+      const drafts: Record<number, string> = {};
+      data.forEach((user: UserAccount) => {
+        drafts[user.id] = user.email || '';
+      });
+      setEmailDrafts(drafts);
     } catch (err) {
       console.error(err);
     } finally {
@@ -174,6 +181,38 @@ export default function AccountsPage() {
     }
   };
 
+  const handleSaveEmail = async (userId: number) => {
+    try {
+      await api.put(`/users/${userId}/email`, { email: emailDrafts[userId] || null });
+      setSuccessMsg('班长邮箱已保存');
+      await loadUsers();
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err: any) {
+      setError(err.message || '邮箱保存失败');
+    }
+  };
+
+  const handleSendMonitorAccounts = async () => {
+    if (!generateResult?.length) {
+      setError('请先批量生成班长账号，再发送账号邮件');
+      return;
+    }
+
+    try {
+      const result = await api.post('/mail/send-monitor-accounts', {
+        accounts: generateResult.filter((item) => item.password && !item.password.includes('*')),
+        systemLink: window.location.origin,
+      });
+      const sentCount = Array.isArray(result) ? result.filter((item: any) => item.status === 'sent').length : 0;
+      const failedCount = Array.isArray(result) ? result.filter((item: any) => item.status === 'failed').length : 0;
+      const totalCount = Array.isArray(result) ? result.length : 0;
+      setSuccessMsg(`账号邮件发送记录 ${totalCount} 条，发送成功 ${sentCount} 条，发送失败 ${failedCount} 条`);
+      setTimeout(() => setSuccessMsg(''), 5000);
+    } catch (err: any) {
+      setError(err.message || '账号邮件发送失败');
+    }
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-64"><div className="text-neutral-400">加载中...</div></div>;
   }
@@ -191,19 +230,19 @@ export default function AccountsPage() {
         <div className="flex gap-2">
           <button
             onClick={handleExportAccounts}
-            className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+            className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 transition-colors hover:bg-[#f6f1e8] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
           >
             导出账号
           </button>
           <button
             onClick={() => setShowCreateAdmin(true)}
-            className="px-4 py-2 text-sm rounded-xl border border-primary-300 dark:border-primary-700 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
+            className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-[#7c4a34] transition-colors hover:bg-[#f6f1e8] dark:border-primary-700 dark:bg-neutral-900 dark:text-primary-300 dark:hover:bg-primary-900/30"
           >
             新增管理员
           </button>
           <button
             onClick={() => setShowGenerate(true)}
-            className="px-4 py-2 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+            className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white transition-colors hover:bg-[#7c4a34]"
           >
             批量生成班长账号
           </button>
@@ -212,12 +251,12 @@ export default function AccountsPage() {
 
       {/* Messages */}
       {successMsg && (
-        <div className="px-4 py-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 text-sm">
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
           {successMsg}
         </div>
       )}
       {error && (
-        <div className="px-4 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
           {error}
           <button onClick={() => setError('')} className="ml-2 text-red-500 hover:text-red-700">✕</button>
         </div>
@@ -230,22 +269,28 @@ export default function AccountsPage() {
             <h2 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings">生成结果（含密码）</h2>
             <div className="flex gap-2">
               <button
+                onClick={handleSendMonitorAccounts}
+                className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-[#7c4a34] transition-colors hover:bg-[#f6f1e8] dark:border-primary-800 dark:bg-neutral-900 dark:text-primary-300 dark:hover:bg-primary-900/20"
+              >
+                发送账号邮件
+              </button>
+              <button
                 onClick={handleExportGenerateResult}
-                className="px-4 py-2 text-sm rounded-xl bg-green-600 text-white hover:bg-green-700 transition-colors"
+                className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white transition-colors hover:bg-[#7c4a34]"
               >
                 导出为Excel（含密码）
               </button>
               <button
                 onClick={() => setGenerateResult(null)}
-                className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 transition-colors hover:bg-[#f6f1e8] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
               >
                 关闭
               </button>
             </div>
           </div>
-          <div className="rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-500/5 overflow-hidden">
+          <div className="overflow-hidden rounded-lg border border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950">
             <div className="px-4 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs">
-              ⚠ 请及时导出或记录密码，关闭后密码将不再显示
+              请及时导出或记录密码，关闭后密码将不再显示
             </div>
             <table className="w-full text-sm">
               <thead>
@@ -286,7 +331,7 @@ export default function AccountsPage() {
       {/* Admin accounts */}
       <div>
         <h2 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-3">管理员账号 ({admins.length})</h2>
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden">
+        <div className="overflow-hidden rounded-lg border border-[#ded6c8] bg-white dark:border-neutral-800 dark:bg-neutral-900">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
@@ -328,7 +373,7 @@ export default function AccountsPage() {
       {/* Monitor accounts */}
       <div>
         <h2 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-3">班长账号 ({monitors.length})</h2>
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden">
+        <div className="overflow-hidden rounded-lg border border-[#ded6c8] bg-white dark:border-neutral-800 dark:bg-neutral-900">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
@@ -336,6 +381,7 @@ export default function AccountsPage() {
                 <th className="px-4 py-3 text-left font-medium text-neutral-600 dark:text-neutral-300">显示名</th>
                 <th className="px-4 py-3 text-left font-medium text-neutral-600 dark:text-neutral-300">年级</th>
                 <th className="px-4 py-3 text-left font-medium text-neutral-600 dark:text-neutral-300">班级</th>
+                <th className="px-4 py-3 text-left font-medium text-neutral-600 dark:text-neutral-300">邮箱</th>
                 <th className="px-4 py-3 text-right font-medium text-neutral-600 dark:text-neutral-300">操作</th>
               </tr>
             </thead>
@@ -346,8 +392,22 @@ export default function AccountsPage() {
                   <td className="px-4 py-3 text-neutral-950 dark:text-white">{u.displayName}</td>
                   <td className="px-4 py-3 text-neutral-500 dark:text-neutral-400">{(u as any).class?.grade?.name || '-'}</td>
                   <td className="px-4 py-3 text-neutral-500 dark:text-neutral-400">{(u.class as any)?.name || '-'}</td>
+                  <td className="px-4 py-3">
+                    <input
+                      value={emailDrafts[u.id] || ''}
+                      onChange={(event) => setEmailDrafts({ ...emailDrafts, [u.id]: event.target.value })}
+                      placeholder="班长邮箱"
+                      className="w-56 rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                    />
+                  </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => handleSaveEmail(u.id)}
+                        className="text-xs text-green-600 dark:text-green-400 hover:text-green-700"
+                      >
+                        保存邮箱
+                      </button>
                       <button
                         onClick={() => handleResetPassword(u.id, u.username)}
                         className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300"
@@ -366,7 +426,7 @@ export default function AccountsPage() {
               ))}
               {monitors.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="text-center py-8 text-neutral-400">暂无班长账号</td>
+                  <td colSpan={6} className="text-center py-8 text-neutral-400">暂无班长账号</td>
                 </tr>
               )}
             </tbody>
@@ -377,7 +437,7 @@ export default function AccountsPage() {
       {/* Generate Modal */}
       {showGenerate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setShowGenerate(false)}>
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 w-96 shadow-xl border border-neutral-200 dark:border-neutral-800" onClick={(e) => e.stopPropagation()}>
+          <div className="w-96 rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-4">批量生成班长账号</h3>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">
               为选定年级下的每个班级自动生成一个班长账号。用户名格式: monitor_年级_班级名。生成后会显示随机密码，请及时导出保存。
@@ -387,7 +447,7 @@ export default function AccountsPage() {
               <select
                 value={selectedGrade}
                 onChange={(e) => setSelectedGrade(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+                className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
               >
                 <option value={0}>全部年级</option>
                 {grades.map((g) => (
@@ -396,11 +456,11 @@ export default function AccountsPage() {
               </select>
             </div>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowGenerate(false)} className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">取消</button>
+              <button onClick={() => setShowGenerate(false)} className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">取消</button>
               <button
                 onClick={handleGenerate}
                 disabled={generating}
-                className="px-4 py-2 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50"
+                className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34] disabled:opacity-50"
               >
                 {generating ? '生成中...' : '开始生成'}
               </button>
@@ -412,7 +472,7 @@ export default function AccountsPage() {
       {/* Create Admin Modal */}
       {showCreateAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setShowCreateAdmin(false)}>
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 w-96 shadow-xl border border-neutral-200 dark:border-neutral-800" onClick={(e) => e.stopPropagation()}>
+          <div className="w-96 rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-4">新增管理员账号</h3>
             <div className="space-y-4">
               <div>
@@ -422,7 +482,7 @@ export default function AccountsPage() {
                   value={adminUsername}
                   onChange={(e) => setAdminUsername(e.target.value)}
                   placeholder="请输入用户名"
-                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+                  className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
               <div>
@@ -432,7 +492,7 @@ export default function AccountsPage() {
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
                   placeholder="请输入密码"
-                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+                  className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
               <div>
@@ -442,16 +502,16 @@ export default function AccountsPage() {
                   value={adminDisplayName}
                   onChange={(e) => setAdminDisplayName(e.target.value)}
                   placeholder="可选，默认为用户名"
-                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+                  className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-6">
-              <button onClick={() => setShowCreateAdmin(false)} className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">取消</button>
+              <button onClick={() => setShowCreateAdmin(false)} className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">取消</button>
               <button
                 onClick={handleCreateAdmin}
                 disabled={creatingAdmin || !adminUsername || !adminPassword}
-                className="px-4 py-2 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50"
+                className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34] disabled:opacity-50"
               >
                 {creatingAdmin ? '创建中...' : '创建'}
               </button>

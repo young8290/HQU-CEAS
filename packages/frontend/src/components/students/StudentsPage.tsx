@@ -244,13 +244,13 @@ export default function StudentsPage() {
           <div className="flex gap-2">
             <button
               onClick={handleDownloadTemplate}
-              className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+              className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 transition-colors hover:bg-[#f6f1e8] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
             >
               下载模板
             </button>
             <button
               onClick={() => setShowGlobalImportModal(true)}
-              className="px-4 py-2 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+              className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white transition-colors hover:bg-[#7c4a34]"
             >
               一键导入学生
             </button>
@@ -260,12 +260,12 @@ export default function StudentsPage() {
 
       {/* Messages */}
       {successMsg && (
-        <div className="px-4 py-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 text-sm">
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
           {successMsg}
         </div>
       )}
       {error && (
-        <div className="px-4 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
           {error}
           <button onClick={() => setError('')} className="ml-2 text-red-500 hover:text-red-700">✕</button>
         </div>
@@ -277,10 +277,10 @@ export default function StudentsPage() {
           <div key={grade.id} className="group relative">
             <button
               onClick={() => handleGradeChange(grade.id)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+              className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
                 selectedGrade === grade.id
-                  ? 'bg-primary-500 text-white'
-                  : 'bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 hover:border-primary-300'
+                  ? 'bg-[#9a5b3d] text-white'
+                  : 'border border-[#d8c9b8] bg-white text-neutral-600 hover:border-[#9a5b3d] hover:bg-[#fffaf2] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300'
               }`}
             >
               {grade.name}
@@ -299,7 +299,7 @@ export default function StudentsPage() {
         {isAdmin && (
           <button
             onClick={() => setShowGradeModal(true)}
-            className="px-4 py-2 rounded-xl text-sm font-medium border border-dashed border-neutral-300 dark:border-neutral-600 text-neutral-500 hover:border-primary-400 hover:text-primary-500 transition-colors"
+            className="rounded-md border border-dashed border-[#d8c9b8] px-4 py-2 text-sm font-medium text-neutral-500 transition-colors hover:border-[#9a5b3d] hover:text-[#7c4a34] dark:border-neutral-600 dark:hover:border-primary-400 dark:hover:text-primary-300"
           >
             + 新建年级
           </button>
@@ -356,19 +356,19 @@ export default function StudentsPage() {
               <div className="flex gap-2">
                 <button
                   onClick={handleDownloadTemplate}
-                  className="px-3 py-1.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                  className="rounded-md border border-[#d8c9b8] bg-white px-3 py-1.5 text-sm text-neutral-700 transition-colors hover:bg-[#f6f1e8] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
                 >
                   下载模板
                 </button>
                 <button
                   onClick={() => setShowBatchModal(true)}
-                  className="px-3 py-1.5 text-sm rounded-xl border border-primary-200 dark:border-primary-800 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 transition-colors"
+                  className="rounded-md border border-[#d8c9b8] bg-white px-3 py-1.5 text-sm text-[#7c4a34] transition-colors hover:bg-[#f6f1e8] dark:border-primary-800 dark:bg-neutral-900 dark:text-primary-300 dark:hover:bg-primary-500/10"
                 >
                   批量导入
                 </button>
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="px-3 py-1.5 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+                  className="rounded-md bg-[#9a5b3d] px-3 py-1.5 text-sm text-white transition-colors hover:bg-[#7c4a34]"
                 >
                   添加学生
                 </button>
@@ -376,7 +376,7 @@ export default function StudentsPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden">
+          <div className="overflow-hidden rounded-lg border border-[#ded6c8] bg-white dark:border-neutral-800 dark:bg-neutral-900">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
@@ -425,7 +425,7 @@ export default function StudentsPage() {
                 type="text"
                 value={newStudentNo}
                 onChange={(e) => setNewStudentNo(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+                className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 placeholder="请输入学号"
               />
             </div>
@@ -435,13 +435,13 @@ export default function StudentsPage() {
                 type="text"
                 value={newStudentName}
                 onChange={(e) => setNewStudentName(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+                className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 placeholder="请输入姓名"
               />
             </div>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">取消</button>
-              <button onClick={handleAddStudent} className="px-4 py-2 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600">添加</button>
+              <button onClick={() => setShowAddModal(false)} className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">取消</button>
+              <button onClick={handleAddStudent} className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34]">添加</button>
             </div>
           </div>
         </Modal>
@@ -458,14 +458,14 @@ export default function StudentsPage() {
               type="file"
               accept=".xlsx,.xls"
               onChange={(e) => setBatchFile(e.target.files?.[0] || null)}
-              className="block w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-600 hover:file:bg-primary-100 dark:file:bg-primary-500/10 dark:file:text-primary-400"
+              className="block w-full text-sm text-neutral-500 file:mr-4 file:rounded-md file:border file:border-[#d8c9b8] file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#7c4a34] hover:file:bg-[#f6f1e8] dark:file:border-neutral-800 dark:file:bg-neutral-950 dark:file:text-primary-300"
             />
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowBatchModal(false)} className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">取消</button>
+              <button onClick={() => setShowBatchModal(false)} className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">取消</button>
               <button
                 onClick={handleBatchUpload}
                 disabled={!batchFile || uploading}
-                className="px-4 py-2 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50"
+                className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34] disabled:opacity-50"
               >
                 {uploading ? '上传中...' : '导入'}
               </button>
@@ -482,12 +482,12 @@ export default function StudentsPage() {
               type="text"
               value={newGradeName}
               onChange={(e) => setNewGradeName(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
               placeholder="年级名称，如：2023级"
             />
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowGradeModal(false)} className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">取消</button>
-              <button onClick={handleAddGrade} className="px-4 py-2 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600">创建</button>
+              <button onClick={() => setShowGradeModal(false)} className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">取消</button>
+              <button onClick={handleAddGrade} className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34]">创建</button>
             </div>
           </div>
         </Modal>
@@ -501,12 +501,12 @@ export default function StudentsPage() {
               type="text"
               value={newClassName}
               onChange={(e) => setNewClassName(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
               placeholder="班级名称，如：计算机科学与技术1班"
             />
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowClassModal(false)} className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">取消</button>
-              <button onClick={handleAddClass} className="px-4 py-2 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600">创建</button>
+              <button onClick={() => setShowClassModal(false)} className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">取消</button>
+              <button onClick={handleAddClass} className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34]">创建</button>
             </div>
           </div>
         </Modal>
@@ -520,21 +520,21 @@ export default function StudentsPage() {
               上传Excel文件，格式：A列学号、B列姓名、C列年级（如"2023级"）、D列班级（如"计算机科学与技术1班"）。
               系统会自动创建不存在的年级和班级。
             </p>
-            <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400 text-xs">
+            <div className="rounded-md border border-sky-200 bg-sky-50 p-3 text-xs text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300">
               提示：可点击"下载模板"获取标准格式模板
             </div>
             <input
               type="file"
               accept=".xlsx,.xls"
               onChange={(e) => setGlobalImportFile(e.target.files?.[0] || null)}
-              className="block w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-600 hover:file:bg-primary-100 dark:file:bg-primary-500/10 dark:file:text-primary-400"
+              className="block w-full text-sm text-neutral-500 file:mr-4 file:rounded-md file:border file:border-[#d8c9b8] file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#7c4a34] hover:file:bg-[#f6f1e8] dark:file:border-neutral-800 dark:file:bg-neutral-950 dark:file:text-primary-300"
             />
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowGlobalImportModal(false)} className="px-4 py-2 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">取消</button>
+              <button onClick={() => setShowGlobalImportModal(false)} className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">取消</button>
               <button
                 onClick={handleGlobalImport}
                 disabled={!globalImportFile || uploading}
-                className="px-4 py-2 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50"
+                className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34] disabled:opacity-50"
               >
                 {uploading ? '导入中...' : '开始导入'}
               </button>
@@ -549,7 +549,7 @@ export default function StudentsPage() {
 function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onClose}>
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 w-96 shadow-xl border border-neutral-200 dark:border-neutral-800" onClick={(e) => e.stopPropagation()}>
+      <div className="w-96 rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-4">{title}</h3>
         {children}
       </div>

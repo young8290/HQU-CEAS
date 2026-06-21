@@ -79,117 +79,102 @@ export default function DashboardContent() {
   const isAdmin = user?.role === 'admin';
 
   return (
-    <div className="space-y-8">
-      {/* Welcome */}
-      <div>
-        <h1 className="text-2xl font-bold text-neutral-950 dark:text-white font-headings">
-          欢迎回来，{user?.displayName || user?.username}
-        </h1>
-        <p className="text-neutral-500 dark:text-neutral-400 mt-1">
-          {isAdmin ? '管理员面板' : `${user?.gradeName || ''} ${user?.className || ''} 班长面板`}
-        </p>
-      </div>
+    <div className="space-y-5">
+      <section className="rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-medium text-[#9a5b3d] dark:text-primary-300">{isAdmin ? '全院综测管理' : '班级综测管理'}</p>
+            <h2 className="mt-1 text-xl font-semibold text-neutral-950 dark:text-white">
+              {user?.displayName || user?.username}
+            </h2>
+            <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
+              {isAdmin ? '查看全院综测数据准备情况，处理导入、分数、学生和附件。' : `${user?.gradeName || ''} ${user?.className || ''}，查看本班综测评审与签名状态。`}
+            </p>
+          </div>
+          <span className="w-fit rounded-md border border-[#d9c8b8] bg-white px-3 py-1.5 text-xs text-[#7c4a34] dark:border-neutral-700 dark:bg-neutral-950 dark:text-primary-300">
+            {isAdmin ? '管理员端' : '班长端'}
+          </span>
+        </div>
+      </section>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="当前学年" value={stats?.currentYear || '-'} icon="📅" color="primary" />
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard title="当前学年" value={stats?.currentYear || '-'} />
         {isAdmin && (
           <>
-            <StatCard title="年级总数" value={stats?.totalGrades?.toString() || '0'} icon="🏫" color="blue" />
-            <StatCard title="班级总数" value={stats?.totalClasses?.toString() || '0'} icon="📚" color="green" />
-            <StatCard title="学生总数" value={stats?.totalStudents?.toString() || '0'} icon="👥" color="orange" />
+            <StatCard title="年级总数" value={stats?.totalGrades?.toString() || '0'} />
+            <StatCard title="班级总数" value={stats?.totalClasses?.toString() || '0'} />
+            <StatCard title="学生总数" value={stats?.totalStudents?.toString() || '0'} />
           </>
         )}
         {!isAdmin && (
           <>
-            <StatCard title="所属班级" value={user?.className || '-'} icon="📚" color="blue" />
-            <StatCard title="角色" value="班长" icon="👤" color="green" />
+            <StatCard title="所属班级" value={user?.className || '-'} />
+            <StatCard title="角色" value="班长" />
+            <StatCard title="综测确认" value="待核对" />
           </>
         )}
       </div>
 
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-4">快捷操作</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <section className="rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="mb-4 border-b border-[#e4d8ca] pb-4 dark:border-neutral-800">
+          <h2 className="text-base font-semibold text-neutral-950 dark:text-white">综测系统功能</h2>
+          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">申报审核、奖学金和荣誉称号功能已经放入独立申报系统入口。</p>
+        </div>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           <ActionCard
-            title="填写分数"
-            description="进入分数编辑页面，支持实时保存"
-            href="/scores"
-            icon="📝"
-          />
-          <ActionCard
-            title="导入数据"
-            description={isAdmin ? '导入学业成绩、体育基础分' : '导入个人综测填写表'}
-            href="/import"
-            icon="📥"
+            title={isAdmin ? '分数管理' : '本班综测'}
+            description={isAdmin ? '查看和维护学生综测分数，支撑后续申报候选筛选。' : '核对本班综测分数，完成综测审核小组签名。'}
+            href={isAdmin ? '/scores' : '/monitor/scores'}
           />
           {isAdmin && (
             <>
               <ActionCard
+                title="数据导入"
+                description="导入学生名单、综测数据、体测成绩、体育课成绩和社区表现分。"
+                href="/import"
+              />
+              <ActionCard
                 title="导出附件"
-                description="导出附件2和附件4"
+                description="导出综测附件和基础材料，支持申报前材料准备。"
                 href="/export"
-                icon="📤"
               />
               <ActionCard
-                title="管理学生"
-                description="添加、删除、编辑学生信息"
+                title="学生管理"
+                description="维护学生、班级、年级和班级类别。"
                 href="/students"
-                icon="👥"
-              />
-              <ActionCard
-                title="生成账号"
-                description="批量生成班长账号并导出"
-                href="/accounts"
-                icon="🔐"
               />
               <ActionCard
                 title="系统设置"
-                description="学年管理、修改密码"
+                description="维护学年、开放状态和账号信息。"
                 href="/settings"
-                icon="⚙️"
               />
             </>
           )}
         </div>
-      </div>
+      </section>
     </div>
   );
 }
 
-function StatCard({ title, value, icon, color }: { title: string; value: string; icon: string; color: string }) {
-  const colorClasses: Record<string, string> = {
-    primary: 'bg-primary-50 dark:bg-primary-500/10 border-primary-200 dark:border-primary-800',
-    blue: 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-800',
-    green: 'bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-800',
-    orange: 'bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-800',
-  };
-
+function StatCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className={`rounded-2xl border p-6 ${colorClasses[color] || colorClasses.primary}`}>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-2xl">{icon}</span>
-      </div>
-      <p className="text-sm text-neutral-500 dark:text-neutral-400">{title}</p>
-      <p className="text-xl font-bold text-neutral-950 dark:text-white mt-1 font-headings">{value}</p>
+    <div className="rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+      <p className="text-xs text-neutral-500 dark:text-neutral-400">{title}</p>
+      <p className="mt-1 text-xl font-semibold text-neutral-950 dark:text-white">{value}</p>
     </div>
   );
 }
 
-function ActionCard({ title, description, href, icon }: { title: string; description: string; href: string; icon: string }) {
+function ActionCard({ title, description, href }: { title: string; description: string; href: string }) {
   return (
     <AppLink
       to={href}
-      className="group flex items-start gap-4 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-lg transition-all duration-200"
+      className="group block rounded-lg border border-[#ded6c8] bg-white p-4 transition-colors hover:border-[#9a5b3d] hover:bg-[#fffaf2] dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-primary-500"
     >
-      <span className="text-2xl flex-shrink-0 mt-0.5">{icon}</span>
-      <div>
-        <h3 className="font-medium text-neutral-950 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors font-headings">
+        <h3 className="text-sm font-semibold text-neutral-950 transition-colors group-hover:text-[#7c4a34] dark:text-white dark:group-hover:text-primary-300">
           {title}
         </h3>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">{description}</p>
-      </div>
+        <p className="mt-2 text-sm leading-6 text-neutral-600 dark:text-neutral-300">{description}</p>
     </AppLink>
   );
 }

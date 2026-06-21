@@ -5,9 +5,9 @@ export default function NotFoundRoute() {
   usePageMeta('404 - 页面未找到');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-neutral-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 px-4">
-      <div className="text-center rounded-3xl border border-neutral-200 bg-white/80 p-10 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
-        <p className="font-headings text-7xl text-primary-500">404</p>
+    <div className="flex min-h-screen items-center justify-center bg-[#f6f1e8] px-4 dark:bg-neutral-950">
+      <div className="w-full max-w-md rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-8 text-center shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+        <p className="text-6xl font-semibold text-[#9a5b3d] dark:text-primary-300">404</p>
         <h1 className="mt-4 text-2xl font-semibold text-neutral-950 dark:text-white">
           页面未找到
         </h1>
@@ -16,7 +16,7 @@ export default function NotFoundRoute() {
         </p>
         <AppLink
           to="/login"
-          className="mt-6 inline-flex rounded-2xl bg-primary-500 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-600"
+          className="mt-6 inline-flex rounded-md bg-[#9a5b3d] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#7c4a34]"
         >
           返回登录页
         </AppLink>

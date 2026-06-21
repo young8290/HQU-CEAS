@@ -95,10 +95,10 @@ export default function ScoresPage() {
               <button
                 key={grade.id}
                 onClick={() => handleGradeChange(grade.id)}
-                className={`p-4 rounded-2xl border text-left transition-all duration-200 ${
+                className={`rounded-lg border p-4 text-left transition-colors duration-200 ${
                   selectedGrade === grade.id
-                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/10'
-                    : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-primary-300'
+                    ? 'border-[#9a5b3d] bg-[#fffaf2] text-[#7c4a34] dark:border-primary-700 dark:bg-primary-500/10 dark:text-primary-300'
+                    : 'border-[#ded6c8] bg-white text-neutral-600 hover:border-[#9a5b3d] hover:bg-[#fffaf2] dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:border-primary-700'
                 }`}
               >
                 <span className="font-medium text-neutral-950 dark:text-white">{grade.name}</span>
@@ -121,10 +121,10 @@ export default function ScoresPage() {
                   key={cls.id}
                   onClick={() => setSelectedClass(cls.id)}
                   disabled={!isAdmin && cls.id !== user?.classId}
-                  className={`p-5 rounded-2xl border text-left transition-all duration-200 ${
+                  className={`rounded-lg border p-5 text-left transition-colors duration-200 ${
                     !isAdmin && cls.id !== user?.classId
-                      ? 'opacity-50 cursor-not-allowed border-neutral-200 dark:border-neutral-800'
-                      : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-md cursor-pointer'
+                      ? 'cursor-not-allowed border-[#ded6c8] opacity-50 dark:border-neutral-800'
+                      : 'cursor-pointer border-[#ded6c8] bg-white hover:border-[#9a5b3d] hover:bg-[#fffaf2] dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-700'
                   }`}
                 >
                   <div className="flex items-center justify-between">

@@ -15,5 +15,6 @@ pnpm-debug.log*
 .vite/
 .vite-temp/
 .prisma/
+scripts/.guide-build/
 .idea/
 .vscode/
