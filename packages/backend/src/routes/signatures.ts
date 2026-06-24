@@ -7,6 +7,10 @@ router.use(authMiddleware);
 
 router.post('/', async (req: Request, res: Response) => {
   try {
+    if (req.user!.role === 'reviewer' && req.body.purpose !== 'score_review_confirmation') {
+      res.status(403).json({ error: 'permission_denied' });
+      return;
+    }
     res.json(await signatureService.saveSignature({
       signerName: req.body.signerName,
       method: req.body.method || 'draw',

@@ -3,6 +3,7 @@ import { Server } from 'http';
 import { verifyToken, TokenPayload } from '../utils/token.js';
 import * as scoreService from '../services/scoreService.js';
 import * as academicYearService from '../services/academicYearService.js';
+import * as scoreReviewInviteService from '../services/scoreReviewInviteService.js';
 
 interface AuthenticatedWebSocket extends WebSocket {
   user?: TokenPayload;
@@ -11,6 +12,29 @@ interface AuthenticatedWebSocket extends WebSocket {
 }
 
 const classrooms = new Map<number, Set<AuthenticatedWebSocket>>();
+const adminAuditClients = new Set<AuthenticatedWebSocket>();
+
+export function broadcastToClass(classId: number, message: Record<string, unknown>) {
+  if (!classrooms.has(classId)) return;
+  classrooms.get(classId)!.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(message));
+    }
+  });
+}
+
+export function broadcastToAdmins(message: Record<string, unknown>) {
+  adminAuditClients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(message));
+    }
+  });
+}
+
+export function broadcastScoreReviewAudit(classId: number, audit: unknown) {
+  broadcastToClass(classId, { type: 'score-review:log:sync', log: audit });
+  broadcastToAdmins({ type: 'audit-log:sync', log: audit });
+}
 
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ server, path: '/ws' });
@@ -64,6 +88,10 @@ export function setupWebSocket(server: Server) {
               ws.send(JSON.stringify({ type: 'error', error: '无权访问该班级' }));
               return;
             }
+            if (ws.user!.role === 'reviewer' && ws.user!.classId !== classId) {
+              ws.send(JSON.stringify({ type: 'error', error: 'permission_denied' }));
+              return;
+            }
 
             // Leave previous classroom
             if (ws.classId && classrooms.has(ws.classId)) {
@@ -81,8 +109,29 @@ export function setupWebSocket(server: Server) {
             break;
           }
 
+          case 'join:audit-admin': {
+            if (ws.user!.role !== 'admin') {
+              ws.send(JSON.stringify({ type: 'error', error: 'permission_denied' }));
+              return;
+            }
+            adminAuditClients.add(ws);
+            ws.send(JSON.stringify({ type: 'joined:audit-admin' }));
+            break;
+          }
+
           case 'score:update': {
+            if (ws.user!.role === 'reviewer') {
+              ws.send(JSON.stringify({ type: 'score:error', error: 'permission_denied' }));
+              return;
+            }
             const { studentId, category, value, remark } = msg;
+            if (ws.user!.role === 'monitor') {
+              if (!ws.user!.classId) {
+                ws.send(JSON.stringify({ type: 'score:error', studentId, category, error: 'permission_denied' }));
+                return;
+              }
+              await scoreService.assertStudentInClass(parseInt(studentId), ws.user!.classId);
+            }
 
             // Role-based editability check
             const { SCORE_CATEGORIES } = await import('../config/scoreRules.js');
@@ -149,6 +198,40 @@ export function setupWebSocket(server: Server) {
             }
             break;
           }
+
+          case 'score-review:check:update': {
+            const { studentId, status, remark } = msg;
+            try {
+              const result = await scoreReviewInviteService.updateStudentCheck({
+                payload: ws.user!,
+                studentId: parseInt(studentId),
+                status,
+                remark,
+              });
+              ws.send(JSON.stringify({
+                type: 'score-review:check:updated',
+                studentId: parseInt(studentId),
+                check: result.check,
+                aggregate: result.aggregate,
+              }));
+              if (ws.user!.classId) {
+                broadcastToClass(ws.user!.classId, {
+                  type: 'score-review:check:sync',
+                  studentId: parseInt(studentId),
+                  check: result.check,
+                  aggregate: result.aggregate,
+                });
+                broadcastScoreReviewAudit(ws.user!.classId, result.audit);
+              }
+            } catch (err: any) {
+              ws.send(JSON.stringify({
+                type: 'score-review:check:error',
+                studentId: parseInt(studentId),
+                error: err.message,
+              }));
+            }
+            break;
+          }
         }
       } catch (err) {
         ws.send(JSON.stringify({ type: 'error', error: '消息格式错误' }));
@@ -162,6 +245,7 @@ export function setupWebSocket(server: Server) {
           classrooms.delete(ws.classId);
         }
       }
+      adminAuditClients.delete(ws);
     });
   });
 

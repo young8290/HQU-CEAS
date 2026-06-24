@@ -34,7 +34,18 @@ router.get('/class/:classId', monitorClassCheck, async (req: Request, res: Respo
 // Get scores by student
 router.get('/student/:studentId', async (req: Request, res: Response) => {
   try {
+    if (req.user!.role === 'reviewer') {
+      res.status(403).json({ error: 'permission_denied' });
+      return;
+    }
     const studentId = parseInt(req.params.studentId as string);
+    if (req.user!.role === 'monitor') {
+      if (!req.user!.classId) {
+        res.status(403).json({ error: 'permission_denied' });
+        return;
+      }
+      await scoreService.assertStudentInClass(studentId, req.user!.classId);
+    }
     const yearId = parseInt(req.query.yearId as string) || 0;
     
     let academicYearId = yearId;
@@ -57,6 +68,10 @@ router.get('/student/:studentId', async (req: Request, res: Response) => {
 // Update single score (REST fallback for WebSocket)
 router.put('/', async (req: Request, res: Response) => {
   try {
+    if (req.user!.role === 'reviewer') {
+      res.status(403).json({ error: 'permission_denied' });
+      return;
+    }
     const { studentId, category, value, remark, academicYearId } = req.body;
 
     // Role-based editability check
@@ -82,8 +97,16 @@ router.put('/', async (req: Request, res: Response) => {
       yearId = current.id;
     }
 
+    if (req.user!.role === 'monitor') {
+      if (!req.user!.classId) {
+        res.status(403).json({ error: 'permission_denied' });
+        return;
+      }
+      await scoreService.assertStudentInClass(parseInt(studentId), req.user!.classId);
+    }
+
     const scores = await scoreService.updateScore({
-      studentId,
+      studentId: parseInt(studentId),
       academicYearId: yearId,
       category,
       value: parseFloat(value),
@@ -121,7 +144,15 @@ router.post('/calculate-total/:classId', monitorClassCheck, async (req: Request,
 // Validate scores
 router.get('/validate/:classId', async (req: Request, res: Response) => {
   try {
+    if (req.user!.role === 'reviewer') {
+      res.status(403).json({ error: 'permission_denied' });
+      return;
+    }
     const classId = parseInt(req.params.classId as string);
+    if (req.user!.role === 'monitor' && req.user!.classId !== classId) {
+      res.status(403).json({ error: 'permission_denied' });
+      return;
+    }
     let academicYearId = parseInt(req.query.yearId as string) || 0;
     
     if (!academicYearId) {

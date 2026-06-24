@@ -12,7 +12,7 @@ model User {
   id           Int      @id @default(autoincrement())
   username     String   @unique
   passwordHash String   @map("password_hash")
-  role         String   @default("monitor") // "admin" | "monitor"
+  role         String   @default("monitor") // "admin" | "monitor" | "reviewer"
   classId      Int?     @map("class_id")
   displayName  String?  @map("display_name")
   email        String?
@@ -34,6 +34,8 @@ model User {
   mailConfigs           MailConfig[] @relation("MailConfigUpdatedBy")
   mailTemplates         MailTemplate[] @relation("MailTemplateUpdatedBy")
   mailLogs              MailLog[] @relation("MailLogSentBy")
+  createdScoreReviewInvites ScoreReviewMemberInvite[] @relation("ScoreReviewInviteCreatedBy")
+  reviewerScoreReviewInvites ScoreReviewMemberInvite[] @relation("ScoreReviewInviteReviewer")
 
   @@map("users")
 }
@@ -83,6 +85,7 @@ model Student {
   declarationStudents DeclarationStudent[]
   declarationSupplements DeclarationSupplement[]
   tags Tag[]
+  scoreReviewStudentChecks ScoreReviewStudentCheck[]
 
   @@map("students")
 }
@@ -314,6 +317,8 @@ model ScoreReviewRecord {
   class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
   pdfFile PdfFile? @relation(fields: [pdfFileId], references: [id], onDelete: SetNull)
   members ScoreReviewGroupMember[]
+  invites ScoreReviewMemberInvite[]
+  studentChecks ScoreReviewStudentCheck[]
 
   @@unique([academicYearId, classId])
   @@map("score_review_records")
@@ -330,8 +335,56 @@ model ScoreReviewGroupMember {
 
   record ScoreReviewRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
   signatureFile SignatureFile? @relation(fields: [signatureFileId], references: [id], onDelete: SetNull)
+  invites ScoreReviewMemberInvite[]
+  studentChecks ScoreReviewStudentCheck[]
 
   @@map("score_review_group_members")
+}
+
+model ScoreReviewMemberInvite {
+  id Int @id @default(autoincrement())
+  recordId Int @map("record_id")
+  memberId Int @map("member_id")
+  reviewerUserId Int? @map("reviewer_user_id")
+  tokenHash String @unique @map("token_hash")
+  deviceIdHash String? @map("device_id_hash")
+  deviceBoundAt DateTime? @map("device_bound_at")
+  status String @default("active")
+  expiresAt DateTime @map("expires_at")
+  lastLoginAt DateTime? @map("last_login_at")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  record ScoreReviewRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  member ScoreReviewGroupMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  reviewerUser User? @relation("ScoreReviewInviteReviewer", fields: [reviewerUserId], references: [id], onDelete: SetNull)
+  createdByUser User? @relation("ScoreReviewInviteCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([recordId])
+  @@index([memberId])
+  @@index([reviewerUserId])
+  @@map("score_review_member_invites")
+}
+
+model ScoreReviewStudentCheck {
+  id Int @id @default(autoincrement())
+  recordId Int @map("record_id")
+  memberId Int @map("member_id")
+  studentId Int @map("student_id")
+  status String @default("pending")
+  remark String?
+  checkedAt DateTime? @map("checked_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  record ScoreReviewRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  member ScoreReviewGroupMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([recordId, memberId, studentId])
+  @@index([recordId])
+  @@index([studentId])
+  @@map("score_review_student_checks")
 }
 
 model StoredFile {
@@ -414,6 +467,8 @@ model AuditLog {
   id Int @id @default(autoincrement())
   module String
   action String
+  academicYearId Int? @map("academic_year_id")
+  classId Int? @map("class_id")
   actorId Int? @map("actor_id")
   targetType String? @map("target_type")
   targetId Int? @map("target_id")
@@ -424,6 +479,7 @@ model AuditLog {
   actor User? @relation("AuditLogActor", fields: [actorId], references: [id], onDelete: SetNull)
 
   @@index([module, action, createdAt])
+  @@index([academicYearId, classId])
   @@map("audit_logs")
 }
 

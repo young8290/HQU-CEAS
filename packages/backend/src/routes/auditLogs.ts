@@ -10,6 +10,8 @@ router.get('/', async (req: Request, res: Response) => {
     res.json(await auditService.listAuditLogs({
       module: req.query.module as string | undefined,
       action: req.query.action as string | undefined,
+      academicYearId: req.query.academicYearId ? parseInt(req.query.academicYearId as string) : undefined,
+      classId: req.query.classId ? parseInt(req.query.classId as string) : undefined,
       page: req.query.page ? parseInt(req.query.page as string) : undefined,
       pageSize: req.query.pageSize ? parseInt(req.query.pageSize as string) : undefined,
     }));

@@ -6,6 +6,8 @@ export interface TokenPayload {
   username: string;
   role: string;
   classId: number | null;
+  reviewInviteId?: number;
+  reviewMemberId?: number;
 }
 
 export function generateToken(payload: TokenPayload): string {

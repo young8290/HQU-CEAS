@@ -65,6 +65,14 @@ export async function getCurrentUser(userId: number) {
 
   if (!user) throw new Error('用户不存在');
 
+  const activeInvite = user.role === 'reviewer'
+    ? await prisma.scoreReviewMemberInvite.findFirst({
+      where: { reviewerUserId: user.id, status: 'active' },
+      include: { member: true },
+      orderBy: { createdAt: 'desc' },
+    })
+    : null;
+
   return {
     id: user.id,
     username: user.username,
@@ -74,5 +82,8 @@ export async function getCurrentUser(userId: number) {
     className: user.class?.name || null,
     gradeId: user.class?.gradeId || null,
     gradeName: user.class?.grade?.name || null,
+    reviewInviteId: activeInvite?.id,
+    reviewMemberId: activeInvite?.memberId,
+    reviewMemberName: activeInvite?.member?.name,
   };
 }

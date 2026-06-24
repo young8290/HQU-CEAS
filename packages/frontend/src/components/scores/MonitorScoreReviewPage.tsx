@@ -7,12 +7,15 @@ import SignatureUpload from '../signature/SignatureUpload';
 import ScoresPage from './ScoresPage';
 import { api } from '../../lib/api';
 import { getUser } from '../../lib/auth';
+import { wsClient } from '../../lib/ws';
 
 export default function MonitorScoreReviewPage() {
   const user = getUser();
   const classId = user?.classId;
   const [record, setRecord] = useState<any>(null);
   const [members, setMembers] = useState<Array<{ name: string; roleName: string }>>([]);
+  const [invites, setInvites] = useState<Record<number, any>>({});
+  const [logs, setLogs] = useState<any[]>([]);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -22,8 +25,14 @@ export default function MonitorScoreReviewPage() {
       return;
     }
     try {
-      const data = await api.get(`/score-review-groups/${classId}`, { forceRefresh: true });
+      const [data, inviteData, logData] = await Promise.all([
+        api.get(`/score-review-groups/${classId}`, { forceRefresh: true }),
+        api.get(`/score-review-invites/${classId}`, { forceRefresh: true }),
+        api.get(`/score-review-invites/${classId}/logs`, { forceRefresh: true }),
+      ]);
       setRecord(data);
+      setInvites(Object.fromEntries((inviteData.members || []).map((item: any) => [item.memberId, item])));
+      setLogs(logData.data || []);
       setMembers((data.members || []).map((item: any) => ({
         name: item.name || '',
         roleName: item.roleName || '',
@@ -37,6 +46,26 @@ export default function MonitorScoreReviewPage() {
 
   useEffect(() => {
     load();
+  }, [classId]);
+
+  useEffect(() => {
+    if (!classId) return;
+    wsClient.connect();
+    wsClient.joinClass(classId);
+    const handleLogSync = (data: any) => {
+      if (!data.log) return;
+      setLogs((prev) => [data.log, ...prev.filter((item) => item.id !== data.log.id)].slice(0, 50));
+    };
+    const handleSignatureSync = (data: any) => {
+      if (data.record) setRecord(data.record);
+    };
+    wsClient.on('score-review:log:sync', handleLogSync);
+    wsClient.on('score-review:signature:sync', handleSignatureSync);
+    return () => {
+      wsClient.off('score-review:log:sync', handleLogSync);
+      wsClient.off('score-review:signature:sync', handleSignatureSync);
+      wsClient.disconnect();
+    };
   }, [classId]);
 
   async function saveMemberSignature(memberId: number, imageData: string, method: 'draw' | 'upload') {
@@ -79,6 +108,46 @@ export default function MonitorScoreReviewPage() {
         roleName: item.roleName || '',
       })));
       setMessage('审核小组成员已保存');
+    } catch (error: any) {
+      setMessage(error.message);
+    }
+  }
+
+  async function generateInvite(memberId: number) {
+    if (!classId) return;
+    try {
+      const result = await api.post(`/score-review-invites/${classId}/members/${memberId}`, {
+        baseUrl: window.location.origin,
+      });
+      await navigator.clipboard?.writeText(result.url);
+      setInvites((prev) => ({
+        ...prev,
+        [memberId]: {
+          ...(prev[memberId] || {}),
+          inviteStatus: result.invite.status,
+          deviceBound: Boolean(result.invite.deviceIdHash),
+          expiresAt: result.invite.expiresAt,
+          lastLoginAt: result.invite.lastLoginAt,
+        },
+      }));
+      setMessage(`审核链接已生成并复制：${result.url}`);
+    } catch (error: any) {
+      setMessage(error.message);
+    }
+  }
+
+  async function revokeInvite(memberId: number) {
+    if (!classId) return;
+    try {
+      await api.delete(`/score-review-invites/${classId}/members/${memberId}`);
+      setInvites((prev) => ({
+        ...prev,
+        [memberId]: {
+          ...(prev[memberId] || {}),
+          inviteStatus: 'revoked',
+        },
+      }));
+      setMessage('审核链接已撤销');
     } catch (error: any) {
       setMessage(error.message);
     }
@@ -165,29 +234,82 @@ export default function MonitorScoreReviewPage() {
 
         {record?.members?.length ? (
           <div className="grid gap-4 xl:grid-cols-2">
-            {record.members.map((member: any) => (
-              <div key={member.id} className="rounded-lg border border-[#ded6c8] bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-neutral-900 dark:text-white">{member.name}</p>
-                    <p className="text-xs text-neutral-500">{member.roleName || '审核小组成员'}</p>
+            {record.members.map((member: any) => {
+              const invite = invites[member.id];
+              return (
+                <div key={member.id} className="rounded-lg border border-[#ded6c8] bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-neutral-900 dark:text-white">{member.name}</p>
+                      <p className="text-xs text-neutral-500">{member.roleName || '审核小组成员'}</p>
+                    </div>
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <StatusChip label={member.signatureFileId ? '已签名' : '未签名'} tone={member.signatureFileId ? 'success' : 'warning'} />
+                      <StatusChip label={invite?.deviceBound ? '已绑定设备' : '未绑定设备'} tone={invite?.deviceBound ? 'success' : 'neutral'} />
+                    </div>
                   </div>
-                  <StatusChip label={member.signatureFileId ? '已签名' : '未签名'} tone={member.signatureFileId ? 'success' : 'warning'} />
+                  <div className="mb-3 rounded-md border border-[#eee4d8] bg-[#fffaf2] p-3 text-xs text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => generateInvite(member.id)}
+                        className="rounded-md bg-[#9a5b3d] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#7c4a34]"
+                      >
+                        {invite?.inviteStatus === 'active' ? '刷新审核链接' : '生成审核链接'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => revokeInvite(member.id)}
+                        className="rounded-md border border-red-200 px-3 py-1.5 text-xs text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300"
+                      >
+                        撤销链接
+                      </button>
+                    </div>
+                    <p>链接状态：{invite?.inviteStatus || 'none'}</p>
+                    <p>最近访问：{invite?.lastLoginAt ? new Date(invite.lastLoginAt).toLocaleString() : '-'}</p>
+                    <p>过期时间：{invite?.expiresAt ? new Date(invite.expiresAt).toLocaleString() : '-'}</p>
+                  </div>
+                  <SignaturePad
+                    signerName={member.name}
+                    purpose="综测评审确认书"
+                    onSaved={(imageData) => saveMemberSignature(member.id, imageData, 'draw')}
+                  />
+                  <div className="mt-3">
+                    <SignatureUpload onLoaded={(imageData) => saveMemberSignature(member.id, imageData, 'upload')} />
+                  </div>
                 </div>
-                <SignaturePad
-                  signerName={member.name}
-                  purpose="综测评审确认书"
-                  onSaved={(imageData) => saveMemberSignature(member.id, imageData, 'draw')}
-                />
-                <div className="mt-3">
-                  <SignatureUpload onLoaded={(imageData) => saveMemberSignature(member.id, imageData, 'upload')} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <p className="text-sm text-neutral-500">保存审核小组成员后即可采集签名。</p>
         )}
+      </DataPanel>
+
+      <DataPanel title="班级操作日志" description="展示本班综测评审邀请、登录、审核状态和签名记录。">
+        <div className="max-h-[360px] overflow-y-auto">
+          <table className="min-w-full text-left text-sm">
+            <thead className="bg-neutral-50 text-xs text-neutral-500 dark:bg-neutral-950">
+              <tr>
+                <th className="px-3 py-2">时间</th>
+                <th className="px-3 py-2">动作</th>
+                <th className="px-3 py-2">操作人</th>
+                <th className="px-3 py-2">对象</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+              {logs.map((log) => (
+                <tr key={log.id || `${log.action}-${log.createdAt}`}>
+                  <td className="px-3 py-2">{log.createdAt ? new Date(log.createdAt).toLocaleString() : '-'}</td>
+                  <td className="px-3 py-2">{log.action}</td>
+                  <td className="px-3 py-2">{log.actor?.displayName || log.actor?.username || '-'}</td>
+                  <td className="px-3 py-2">{log.targetType || '-'} #{log.targetId || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {logs.length === 0 && <div className="py-8 text-center text-sm text-neutral-500">暂无操作日志</div>}
+        </div>
       </DataPanel>
 
       <ScoresPage />

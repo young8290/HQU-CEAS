@@ -69,6 +69,20 @@ export async function getScoresByStudent(
   return scoreMap;
 }
 
+export async function assertStudentInClass(studentId: number, classId: number) {
+  const student = await prisma.student.findUnique({
+    where: { id: studentId },
+    select: { id: true, classId: true },
+  });
+  if (!student) {
+    throw new Error('student_not_found');
+  }
+  if (student.classId !== classId) {
+    throw new Error('student_class_mismatch');
+  }
+  return student;
+}
+
 export async function updateScore(data: {
   studentId: number;
   academicYearId: number;

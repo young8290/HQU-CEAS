@@ -1,12 +1,15 @@
 export interface User {
   id: number;
   username: string;
-  role: 'admin' | 'monitor';
+  role: 'admin' | 'monitor' | 'reviewer';
   displayName: string | null;
   classId: number | null;
   className: string | null;
   gradeId: number | null;
   gradeName: string | null;
+  reviewInviteId?: number;
+  reviewMemberId?: number;
+  reviewMemberName?: string;
 }
 
 export function getToken(): string | null {

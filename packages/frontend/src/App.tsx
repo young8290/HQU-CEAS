@@ -17,6 +17,8 @@ import MonitorDashboardRoute from './routes/MonitorDashboardRoute';
 import MonitorScoresRoute from './routes/MonitorScoresRoute';
 import NotFoundRoute from './routes/NotFoundRoute';
 import RootRoute from './routes/RootRoute';
+import ReviewInviteLoginRoute from './routes/ReviewInviteLoginRoute';
+import ReviewScoresRoute from './routes/ReviewScoresRoute';
 import ScoresRoute from './routes/ScoresRoute';
 import SettingsRoute from './routes/SettingsRoute';
 import StudentsRoute from './routes/StudentsRoute';
@@ -28,6 +30,8 @@ import { useCurrentPath } from './lib/router';
 const routes: Record<string, ComponentType> = {
   '/': RootRoute,
   '/login': LoginRoute,
+  '/review-login': ReviewInviteLoginRoute,
+  '/review/scores': ReviewScoresRoute,
   '/entry': SystemEntryRoute,
   '/dashboard': DashboardRoute,
   '/monitor/dashboard': MonitorDashboardRoute,

@@ -16,6 +16,7 @@ function cellText(cell: ExcelJS.Cell): string {
 export async function listUsers(filters?: { role?: string }) {
   const where: any = {};
   if (filters?.role) where.role = filters.role;
+  if (!filters?.role) where.role = { not: 'reviewer' };
 
   return prisma.user.findMany({
     where,

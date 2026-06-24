@@ -98,7 +98,16 @@ export async function signScoreReviewMember(data: {
   memberId: number;
   signatureFileId: number;
   actorId?: number;
+  auditContext?: {
+    academicYearId?: number;
+    classId?: number;
+  };
 }) {
+  const existingMember = await prisma.scoreReviewGroupMember.findFirst({
+    where: { id: data.memberId, recordId: data.recordId },
+  });
+  if (!existingMember) throw new Error('review_member_not_found');
+
   const member = await prisma.scoreReviewGroupMember.update({
     where: { id: data.memberId },
     data: { signatureFileId: data.signatureFileId, signedAt: new Date() },
@@ -126,19 +135,22 @@ export async function signScoreReviewMember(data: {
   }
 
   cacheService.clear('scoreReviewStatus');
-  await recordAuditLog({
+  const auditLog = await recordAuditLog({
     module: 'score_review',
     action: 'sign_member',
+    academicYearId: data.auditContext?.academicYearId,
+    classId: data.auditContext?.classId,
     actorId: data.actorId,
     targetType: 'ScoreReviewGroupMember',
     targetId: member.id,
     after: { signatureFileId: data.signatureFileId, completed },
   });
 
-  return prisma.scoreReviewRecord.findUnique({
+  const record = await prisma.scoreReviewRecord.findUnique({
     where: { id: data.recordId },
     include: { members: { orderBy: { sortOrder: 'asc' } }, pdfFile: { include: { storedFile: true } } },
   });
+  return record ? { ...record, auditLog } : record;
 }
 
 export async function getScoreReviewStatus(academicYearId: number, classId: number) {

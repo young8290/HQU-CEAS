@@ -78,6 +78,19 @@ class WebSocketClient {
     });
   }
 
+  updateReviewCheck(studentId: number, status: 'pending' | 'reviewed' | 'issue', remark?: string) {
+    this.send({
+      type: 'score-review:check:update',
+      studentId,
+      status,
+      remark,
+    });
+  }
+
+  joinAuditAdmin() {
+    this.send({ type: 'join:audit-admin' });
+  }
+
   on(type: string, handler: MessageHandler) {
     if (!this.handlers.has(type)) {
       this.handlers.set(type, new Set());

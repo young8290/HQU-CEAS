@@ -1,7 +1,7 @@
 ---
 title: feat: 综测评审小组成员邀请审核
 type: feat
-status: active
+status: completed
 date: 2026-06-21
 ---
 

@@ -18,6 +18,8 @@ function sanitize(value: unknown): unknown {
 export async function recordAuditLog(data: {
   module: string;
   action: string;
+  academicYearId?: number | null;
+  classId?: number | null;
   actorId?: number | null;
   targetType?: string | null;
   targetId?: number | null;
@@ -28,6 +30,8 @@ export async function recordAuditLog(data: {
     data: {
       module: data.module,
       action: data.action,
+      academicYearId: data.academicYearId ?? null,
+      classId: data.classId ?? null,
       actorId: data.actorId ?? null,
       targetType: data.targetType ?? null,
       targetId: data.targetId ?? null,
@@ -40,6 +44,8 @@ export async function recordAuditLog(data: {
 export async function listAuditLogs(filters: {
   module?: string;
   action?: string;
+  academicYearId?: number;
+  classId?: number;
   page?: number;
   pageSize?: number;
 }) {
@@ -48,6 +54,8 @@ export async function listAuditLogs(filters: {
   const where = {
     ...(filters.module ? { module: filters.module } : {}),
     ...(filters.action ? { action: filters.action } : {}),
+    ...(filters.academicYearId ? { academicYearId: filters.academicYearId } : {}),
+    ...(filters.classId ? { classId: filters.classId } : {}),
   };
   const [data, total] = await Promise.all([
     prisma.auditLog.findMany({
