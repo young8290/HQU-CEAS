@@ -59,23 +59,48 @@ export async function getOrCreateScoreReviewRecord(data: {
 export async function saveScoreReviewMembers(data: {
   academicYearId: number;
   classId: number;
-  members: Array<{ name: string; roleName?: string }>;
+  members: Array<{ id?: number; name: string; roleName?: string | null }>;
   actorId?: number;
 }) {
   if (data.members.length === 0) {
     throw new Error('审核小组成员不能为空');
   }
   const record = await getOrCreateScoreReviewRecord(data);
+  const existingById = new Map(record.members.map((member) => [member.id, member]));
+  const retainedMemberIds = data.members
+    .map((member) => Number(member.id))
+    .filter((memberId) => existingById.has(memberId));
+  const deleteWhere = retainedMemberIds.length
+    ? { recordId: record.id, id: { notIn: retainedMemberIds } }
+    : { recordId: record.id };
+
   await prisma.$transaction([
-    prisma.scoreReviewGroupMember.deleteMany({ where: { recordId: record.id } }),
-    ...data.members.map((member, index) => prisma.scoreReviewGroupMember.create({
-      data: {
-        recordId: record.id,
-        name: member.name,
-        roleName: member.roleName || null,
-        sortOrder: index,
-      },
-    })),
+    prisma.scoreReviewGroupMember.deleteMany({ where: deleteWhere }),
+    ...data.members.map((member, index) => {
+      const memberId = Number(member.id);
+      const existingMember = existingById.get(memberId);
+      const roleName = member.roleName || null;
+      if (existingMember) {
+        return prisma.scoreReviewGroupMember.update({
+          where: { id: existingMember.id },
+          data: {
+            name: member.name,
+            roleName,
+            sortOrder: index,
+            ...(existingMember.name !== member.name ? { signatureFileId: null, signedAt: null } : {}),
+          },
+        });
+      }
+
+      return prisma.scoreReviewGroupMember.create({
+        data: {
+          recordId: record.id,
+          name: member.name,
+          roleName,
+          sortOrder: index,
+        },
+      });
+    }),
     prisma.scoreReviewRecord.update({
       where: { id: record.id },
       data: { status: 'draft', pdfFileId: null, completedAt: null },

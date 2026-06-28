@@ -4,8 +4,8 @@ export const SCORE_RULES: Record<string, { label: string; max: number | null; ed
   moral: { label: '德育测评', max: 100, editable: true, editableBy: 'all', step: 1 },
   academic: { label: '学业学术素质', max: 60, editable: true, editableBy: 'admin', step: 0.01 },
   innovation: { label: '创新与实践能力', max: 13, editable: true, editableBy: 'all', step: 0.1 },
-  physical_test: { label: '体测成绩', max: 100, editable: true, editableBy: 'admin', step: 0.01 },
-  pe_course: { label: '体育课成绩', max: 100, editable: true, editableBy: 'admin', step: 0.01 },
+  physical_test: { label: '体测成绩', max: 100, editable: false, editableBy: 'none', step: 0.01 },
+  pe_course: { label: '体育课成绩', max: 100, editable: false, editableBy: 'none', step: 0.01 },
   sports_base: { label: '体育基础分', max: null, editable: true, editableBy: 'admin', step: 0.01 },
   sports_reward: { label: '体育奖励分', max: 3, editable: true, editableBy: 'all', step: 0.01 },
   sports_total: { label: '体育总分', max: 7, editable: false, editableBy: 'none', step: 0.01 },
@@ -26,10 +26,42 @@ export function isCategoryEditable(category: string, role: string): boolean {
   return true; // 'all'
 }
 
-export const SCORE_CATEGORIES_ORDER = [
-  'moral', 'academic', 'innovation', 'physical_test', 'pe_course', 'sports_base', 'sports_reward',
-  'sports_total', 'aesthetics', 'labor', 'public_service', 'community', 'bonus', 'total',
-];
+export const EVALUATION_SCORE_CATEGORIES_ORDER = [
+  'moral',
+  'academic',
+  'innovation',
+  'sports_base',
+  'sports_reward',
+  'sports_total',
+  'aesthetics',
+  'labor',
+  'public_service',
+  'bonus',
+  'total',
+] as const;
+
+export const DECLARATION_SCORE_CATEGORIES_ORDER = [
+  'academic',
+  'sports_base',
+  'community',
+  'total',
+] as const;
+
+export const SCORE_DETAIL_CATEGORIES_ORDER = [
+  'moral',
+  'innovation',
+  'sports_reward',
+  'aesthetics',
+  'labor',
+  'public_service',
+  'bonus',
+] as const;
+
+export const SCORE_CATEGORIES_ORDER = [...EVALUATION_SCORE_CATEGORIES_ORDER];
+
+export function supportsScoreDetails(category: string): boolean {
+  return (SCORE_DETAIL_CATEGORIES_ORDER as readonly string[]).includes(category);
+}
 
 export function validateScore(category: string, value: number): string | null {
   const rule = SCORE_RULES[category];

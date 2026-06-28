@@ -14,6 +14,7 @@ import LoginRoute from './routes/LoginRoute';
 import MailRoute from './routes/MailRoute';
 import MailTemplateRoute from './routes/MailTemplateRoute';
 import MonitorDashboardRoute from './routes/MonitorDashboardRoute';
+import MonitorScoreReviewRoute from './routes/MonitorScoreReviewRoute';
 import MonitorScoresRoute from './routes/MonitorScoresRoute';
 import NotFoundRoute from './routes/NotFoundRoute';
 import RootRoute from './routes/RootRoute';
@@ -37,6 +38,7 @@ const routes: Record<string, ComponentType> = {
   '/monitor/dashboard': MonitorDashboardRoute,
   '/scores': ScoresRoute,
   '/monitor/scores': MonitorScoresRoute,
+  '/monitor/score-review': MonitorScoreReviewRoute,
   '/students': StudentsRoute,
   '/import': ImportRoute,
   '/export': ExportRoute,

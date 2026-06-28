@@ -22,6 +22,7 @@ model User {
 
   class       Class?       @relation(fields: [classId], references: [id], onDelete: SetNull)
   scores      Score[]      @relation("UpdatedBy")
+  scoreBonusDetails ScoreBonusDetail[] @relation("ScoreBonusDetailUpdatedBy")
   importLogs  ImportLog[]
   submittedDeclarations DeclarationBatch[] @relation("DeclarationSubmittedBy")
   reviewedDeclarations  DeclarationBatch[] @relation("DeclarationReviewedBy")
@@ -122,9 +123,28 @@ model Score {
   student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
   academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
   updatedByUser User?       @relation("UpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  bonusDetails  ScoreBonusDetail[]
 
   @@unique([studentId, academicYearId, category])
   @@map("scores")
+}
+
+model ScoreBonusDetail {
+  id Int @id @default(autoincrement())
+  scoreId Int @map("score_id")
+  itemName String @map("item_name")
+  itemScore Float @map("item_score")
+  sortOrder Int @default(0) @map("sort_order")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  score Score @relation(fields: [scoreId], references: [id], onDelete: Cascade)
+  updatedByUser User? @relation("ScoreBonusDetailUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([scoreId, sortOrder])
+  @@index([scoreId])
+  @@map("score_bonus_details")
 }
 
 model ImportLog {

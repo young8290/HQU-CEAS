@@ -1,0 +1,924 @@
+
+> comprehensive-eval-monorepo@1.0.0 dev
+> concurrently "npm run dev -w packages/backend" "npm run dev -w packages/frontend"
+
+[1] 
+[1] > comprehensive-eval-frontend@1.0.0 dev
+[1] > vite --port 3000
+[1] 
+[0] 
+[0] > comprehensive-eval-backend@1.0.0 dev
+[0] > tsx watch src/index.ts
+[0] 
+[1] 
+[1]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m1143[22m[2m[0m ms[22m
+[1] 
+[1]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m3000[22m/[39m
+[1]   [32m➜[39m  [1mNetwork[22m: [36mhttp://100.67.13.68:[1m3000[22m/[39m
+[1]   [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.3.9:[1m3000[22m/[39m
+[1]   [32m➜[39m  [1mNetwork[22m: [36mhttp://172.20.144.1:[1m3000[22m/[39m
+[0] Server running on http://localhost:4000
+[0] WebSocket on ws://localhost:4000/ws
+[1] [2m18:28:15[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:28:15[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:30:35[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:30:35[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:30:53[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:30:53[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:34:10[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:34:10[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[0] 18:41:51 [tsx] change in ./src\services\scoreService.ts Restarting...
+[0] cServer running on http://localhost:4000
+[0] WebSocket on ws://localhost:4000/ws
+[1] [2m18:42:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m18:42:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/audit/AuditLogsPage.tsx, /src/components/scores/MonitorScoreReviewPage.tsx, /src/components/scores/ScoreReviewMemberPage.tsx, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m18:42:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m18:43:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m18:43:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m18:43:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m18:44:00[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m18:44:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m18:44:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m18:44:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m18:44:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/routes/MonitorScoresRoute.tsx, /src/styles/global.css[22m
+[1] [2m18:44:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/styles/global.css[22m
+[1] [2m18:45:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/layout/Sidebar.tsx[22m
+[1] [2m18:45:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/routes/SystemEntryRoute.tsx, /src/styles/global.css[22m
+[1] [2m18:45:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[1] [2m18:45:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[1] [2m18:45:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[1] [2m18:47:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[1] [2m18:47:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[1] [2m18:50:13[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:50:13[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:52:18[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:52:18[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:56:13[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:56:13[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:56:30[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:56:30[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:57:16[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:57:16[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:59:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:59:26[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:59:32[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m18:59:32[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:00:42[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:00:42[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:06:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/routes/ReviewInviteLoginRoute.tsx, /src/routes/RootRoute.tsx, /src/routes/SystemEntryRoute.tsx, /src/components/layout/AppShell.tsx, /src/components/import/ImportPage.tsx, /src/components/declarations/SubmissionsPage.tsx, /src/components/scores/ScoresPage.tsx, /src/components/awards/AwardsPage.tsx, /src/components/scores/MonitorScoreReviewPage.tsx, /src/components/settings/SettingsPage.tsx, /src/components/export/ExportPage.tsx, /src/components/scores/ScoreReviewMemberPage.tsx, /src/components/honors/HonorsPage.tsx, /src/components/students/StudentsPage.tsx, /src/components/dashboard/DashboardContent.tsx, /src/components/auth/LoginForm.tsx, /src/components/layout/Sidebar.tsx, /src/components/audit/AuditLogsPage.tsx, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m19:07:10[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/routes/ReviewInviteLoginRoute.tsx, /src/routes/SystemEntryRoute.tsx, /src/components/audit/AuditLogsPage.tsx, /src/components/import/ImportPage.tsx, /src/components/mail/MailTemplatePage.tsx, /src/components/mail/MailPage.tsx, /src/components/declarations/SubmissionsPage.tsx, /src/components/scores/ScoresPage.tsx, /src/components/awards/AwardsPage.tsx, /src/components/declarations/DeclarationReviewsPage.tsx, /src/components/scores/MonitorScoreReviewPage.tsx, /src/components/settings/SettingsPage.tsx, /src/components/export/ExportPage.tsx, /src/components/scores/ScoreReviewMemberPage.tsx, /src/components/honors/HonorsPage.tsx, /src/components/students/StudentsPage.tsx, /src/components/accounts/AccountsPage.tsx, /src/components/dashboard/DashboardContent.tsx, /src/components/tags/TagsPage.tsx, /src/components/auth/LoginForm.tsx, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m19:07:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/audit/AuditLogsPage.tsx, /src/components/scores/MonitorScoreReviewPage.tsx, /src/components/scores/ScoreReviewMemberPage.tsx, /src/components/scores/ScoreEditor.tsx[22m
+[1] [2m19:07:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/routes/ReviewInviteLoginRoute.tsx, /src/styles/global.css[22m
+[1] [2m19:07:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[1] [2m19:08:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[0] 19:09:26 [tsx] change in ./src\services\scoreReviewGroupService.ts Restarting...
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[1] [2m19:09:26[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: read ECONNRESET
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[0] cServer running on http://localhost:4000
+[0] WebSocket on ws://localhost:4000/ws
+[1] [2m19:09:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m19:10:00[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m19:10:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m19:10:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m19:11:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m19:14:51[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:14:51[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:14:51[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:14:51[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:14:52[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:14:52[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:17:23[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:17:23[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:18:03[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:18:03[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:18:14[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m19:18:14[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:47:15[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:47:15[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:47:16[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:47:16[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[0] 00:48:59 [tsx] change in ./src\services\scoreReviewInviteService.ts Restarting...
+[0] cServer running on http://localhost:4000
+[0] WebSocket on ws://localhost:4000/ws
+[0] 00:49:08 [tsx] change in ./src\routes\scoreReviewInvites.ts Restarting...
+[0] cServer running on http://localhost:4000
+[0] WebSocket on ws://localhost:4000/ws
+[1] [2m00:49:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m00:49:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m00:50:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m00:51:13[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:51:13[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:51:13[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:51:13[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:52:10[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:52:10[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:52:11[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:52:11[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:53:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m00:53:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m00:53:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[1] [2m00:54:20[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:54:20[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:54:21[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:54:21[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:55:02[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[1] [2m00:55:02[22m [31m[1m[vite][22m[39m [31mws proxy socket error:[39m
+[1] Error: write ECONNABORTED
+[1]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[1]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[1]     at Socket._writeGeneric (node:net:966:11)
+[1]     at Socket._write (node:net:978:8)
+[1]     at writeOrBuffer (node:internal/streams/writable:570:12)
+[1]     at _write (node:internal/streams/writable:499:10)
+[1]     at Writable.write (node:internal/streams/writable:508:10)
+[1]     at Socket.ondata (node:internal/streams/readable:1008:24)
+[1]     at Socket.emit (node:events:508:28)
+[1]     at addChunk (node:internal/streams/readable:559:12)
+[1]     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+[1]     at Readable.push (node:internal/streams/readable:390:5)
+[1]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23)

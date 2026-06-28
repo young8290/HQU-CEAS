@@ -65,6 +65,37 @@ router.get('/student/:studentId', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/student/:studentId/:category/details', async (req: Request, res: Response) => {
+  try {
+    if (req.user!.role === 'reviewer') {
+      res.status(403).json({ error: 'permission_denied' });
+      return;
+    }
+    const studentId = parseInt(req.params.studentId as string);
+    const category = req.params.category as ScoreCategory;
+    if (req.user!.role === 'monitor') {
+      if (!req.user!.classId) {
+        res.status(403).json({ error: 'permission_denied' });
+        return;
+      }
+      await scoreService.assertStudentInClass(studentId, req.user!.classId);
+    }
+    let academicYearId = parseInt(req.query.yearId as string) || 0;
+    if (!academicYearId) {
+      const current = await academicYearService.getCurrentAcademicYear();
+      if (!current) {
+        res.status(400).json({ error: '未设置当前学年' });
+        return;
+      }
+      academicYearId = current.id;
+    }
+    const details = await scoreService.getScoreBonusDetails({ studentId, academicYearId, category });
+    res.json({ details });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // Update single score (REST fallback for WebSocket)
 router.put('/', async (req: Request, res: Response) => {
   try {
@@ -114,6 +145,43 @@ router.put('/', async (req: Request, res: Response) => {
       updatedBy: req.user!.userId,
     });
     res.json(scores);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.put('/student/:studentId/:category/details', async (req: Request, res: Response) => {
+  try {
+    if (req.user!.role === 'reviewer') {
+      res.status(403).json({ error: 'permission_denied' });
+      return;
+    }
+    const studentId = parseInt(req.params.studentId as string);
+    const category = req.params.category as ScoreCategory;
+    if (req.user!.role === 'monitor') {
+      if (!req.user!.classId) {
+        res.status(403).json({ error: 'permission_denied' });
+        return;
+      }
+      await scoreService.assertStudentInClass(studentId, req.user!.classId);
+    }
+    let academicYearId = parseInt(req.body.academicYearId) || 0;
+    if (!academicYearId) {
+      const current = await academicYearService.getCurrentAcademicYear();
+      if (!current) {
+        res.status(400).json({ error: '未设置当前学年' });
+        return;
+      }
+      academicYearId = current.id;
+    }
+    const result = await scoreService.saveScoreBonusDetails({
+      studentId,
+      academicYearId,
+      category,
+      items: req.body.items || [],
+      updatedBy: req.user!.userId,
+    });
+    res.json(result);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }

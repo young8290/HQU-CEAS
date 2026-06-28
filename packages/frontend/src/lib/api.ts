@@ -1,4 +1,5 @@
 import { navigateTo } from './router';
+import { clearAuth, clearReviewAuth, getReviewToken, getToken } from './auth';
 
 const API_BASE = '/api';
 const CACHE_STORAGE_PREFIX = 'api-cache:';
@@ -29,6 +30,7 @@ interface RequestOptions {
   headers?: Record<string, string>;
   cacheTtl?: number | false;
   forceRefresh?: boolean;
+  authScope?: 'main' | 'review';
 }
 
 function cloneValue<T>(value: T): T {
@@ -39,19 +41,21 @@ function cloneValue<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
 }
 
-function getCacheScope() {
+function getCacheScope(authScope: RequestOptions['authScope'] = 'main') {
   try {
-    const rawUser = localStorage.getItem('user');
+    const rawUser = authScope === 'review'
+      ? sessionStorage.getItem('reviewUser')
+      : localStorage.getItem('user');
     if (!rawUser) return 'guest';
     const user = JSON.parse(rawUser);
-    return `${user.id ?? 'anonymous'}:${user.role ?? 'unknown'}`;
+    return `${authScope}:${user.id ?? 'anonymous'}:${user.role ?? 'unknown'}`;
   } catch {
-    return 'guest';
+    return `${authScope}:guest`;
   }
 }
 
-function getCacheKey(path: string) {
-  return `${CACHE_STORAGE_PREFIX}${getCacheScope()}:${path}`;
+function getCacheKey(path: string, authScope: RequestOptions['authScope'] = 'main') {
+  return `${CACHE_STORAGE_PREFIX}${getCacheScope(authScope)}:${path}`;
 }
 
 function getDefaultCacheTtl(path: string) {
@@ -105,10 +109,11 @@ export function clearApiCache() {
 
 async function request<T = any>(path: string, options: RequestOptions = {}): Promise<T> {
   const method = options.method || 'GET';
+  const authScope = options.authScope || 'main';
   const cacheTtl = method === 'GET'
     ? options.cacheTtl ?? getDefaultCacheTtl(path)
     : false;
-  const cacheKey = cacheTtl ? getCacheKey(path) : null;
+  const cacheKey = cacheTtl ? getCacheKey(path, authScope) : null;
 
   if (method === 'GET' && cacheKey && !options.forceRefresh) {
     const memoryEntry = memoryCache.get(cacheKey);
@@ -132,7 +137,7 @@ async function request<T = any>(path: string, options: RequestOptions = {}): Pro
     }
   }
 
-  const token = localStorage.getItem('token');
+  const token = authScope === 'review' ? getReviewToken() : getToken();
   const headers: Record<string, string> = {
     ...options.headers,
   };
@@ -163,11 +168,16 @@ async function request<T = any>(path: string, options: RequestOptions = {}): Pro
       } catch {}
 
       // Only redirect to login for non-login requests (token expired)
-      if (!path.startsWith('/auth/login')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        clearApiCache();
-        navigateTo('/login', { replace: true });
+      if (!path.startsWith('/auth/login') && !path.startsWith('/score-review-invites/login')) {
+        if (authScope === 'review') {
+          clearReviewAuth();
+          clearApiCache();
+          navigateTo('/review-login', { replace: true });
+        } else {
+          clearAuth();
+          clearApiCache();
+          navigateTo('/login', { replace: true });
+        }
       }
       throw new Error(errorMsg);
     }
@@ -236,6 +246,42 @@ export const api = {
   download: async (path: string, filename: string, body?: any) => {
     const method = body ? 'POST' : 'GET';
     const blob = await request<Blob>(path, { method, body, cacheTtl: false });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+  clearCache: clearApiCache,
+};
+
+export const reviewApi = {
+  get: <T = any>(path: string, options: Pick<RequestOptions, 'cacheTtl' | 'forceRefresh'> = {}) =>
+    request<T>(path, { ...options, method: 'GET', authScope: 'review' }),
+  post: <T = any>(path: string, body?: any) => request<T>(path, { method: 'POST', body, authScope: 'review' }),
+  put: <T = any>(path: string, body?: any) => request<T>(path, { method: 'PUT', body, authScope: 'review' }),
+  delete: <T = any>(path: string, body?: any) => request<T>(path, { method: 'DELETE', body, authScope: 'review' }),
+  upload: <T = any>(path: string, file: File | FormData, fieldName = 'file') => {
+    let formData: FormData;
+    if (file instanceof FormData) {
+      formData = file;
+    } else {
+      formData = new FormData();
+      formData.append(fieldName, file);
+    }
+    return request<T>(path, { method: 'POST', body: formData, authScope: 'review' });
+  },
+  uploadMultiple: <T = any>(path: string, files: File[], fieldName = 'files') => {
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append(fieldName, file);
+    }
+    return request<T>(path, { method: 'POST', body: formData, authScope: 'review' });
+  },
+  download: async (path: string, filename: string, body?: any) => {
+    const method = body ? 'POST' : 'GET';
+    const blob = await request<Blob>(path, { method, body, cacheTtl: false, authScope: 'review' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

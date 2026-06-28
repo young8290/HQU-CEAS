@@ -125,7 +125,7 @@ export async function exportAttachment2(classId: number, academicYearId: number)
   });
   if (!cls || !academicYear) throw new Error('班级或学年不存在');
 
-  const students: ClassScoreStudent[] = await scoreService.getScoresByClass(classId, academicYearId);
+  const students: ClassScoreStudent[] = await scoreService.getScoresByClassForExport(classId, academicYearId);
 
   // Copy template file then fill data
   const workbook = new ExcelJS.Workbook();

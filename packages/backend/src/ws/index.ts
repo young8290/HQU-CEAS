@@ -163,6 +163,11 @@ export function setupWebSocket(server: Server) {
                 remark,
                 updatedBy: ws.user!.userId,
               });
+              const details = await scoreService.getScoreBonusDetails({
+                studentId: parseInt(studentId),
+                academicYearId: msg.academicYearId || currentYear.id,
+                category,
+              });
 
               // Send confirmation back to sender
               ws.send(JSON.stringify({
@@ -170,6 +175,7 @@ export function setupWebSocket(server: Server) {
                 studentId,
                 category,
                 scores,
+                details,
                 updatedAt: new Date().toISOString(),
                 success: true,
               }));
@@ -183,6 +189,7 @@ export function setupWebSocket(server: Server) {
                       studentId,
                       category,
                       scores,
+                      details,
                       updatedBy: ws.user!.username,
                     }));
                   }

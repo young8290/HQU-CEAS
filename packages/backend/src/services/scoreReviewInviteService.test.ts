@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import prisma from '../config/database.js';
-import { loginByInvite, updateStudentCheck } from './scoreReviewInviteService.js';
+import { getClassReviewChecks, loginByInvite, updateStudentCheck } from './scoreReviewInviteService.js';
 
 function replaceMethod(target: any, key: string, value: any) {
   const descriptor = Object.getOwnPropertyDescriptor(target, key);
@@ -130,6 +130,51 @@ test('updateStudentCheck writes reviewer check and scoped audit log', async () =
     assert.equal(auditData.classId, 12);
     assert.equal(auditData.actorId, 61);
     assert.equal(auditData.action, 'student_check_updated');
+  } finally {
+    restores.reverse().forEach((restore) => restore());
+  }
+});
+
+test('getClassReviewChecks returns students, member checks and aggregate status for monitor page', async () => {
+  const invite = activeInvite();
+  const restores = [
+    replaceMethod(prisma.scoreReviewRecord, 'upsert', async () => ({
+      id: invite.recordId,
+      academicYearId: invite.record.academicYearId,
+      classId: invite.record.classId,
+      status: 'draft',
+      pdfFileId: null,
+      completedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      members: [
+        { id: 51, name: '成员一', roleName: '班长', sortOrder: 0, signatureFileId: null, signedAt: null, signatureFile: null },
+        { id: 52, name: '成员二', roleName: '学习委员', sortOrder: 1, signatureFileId: null, signedAt: null, signatureFile: null },
+      ],
+      pdfFile: null,
+    })),
+    replaceMethod(prisma.student, 'findMany', async () => [
+      { id: 101, studentNo: '2026001', name: '学生一' },
+      { id: 102, studentNo: '2026002', name: '学生二' },
+    ]),
+    replaceMethod(prisma.scoreReviewStudentCheck, 'findMany', async () => [
+      { studentId: 101, memberId: 51, status: 'reviewed', remark: null, checkedAt: new Date(), updatedAt: new Date() },
+      { studentId: 101, memberId: 52, status: 'reviewed', remark: null, checkedAt: new Date(), updatedAt: new Date() },
+      { studentId: 102, memberId: 51, status: 'issue', remark: '材料需核对', checkedAt: new Date(), updatedAt: new Date() },
+    ]),
+  ];
+
+  try {
+    const result = await getClassReviewChecks({
+      academicYearId: invite.record.academicYearId,
+      classId: invite.record.classId,
+    });
+
+    assert.equal(result.members.length, 2);
+    assert.equal(result.students.length, 2);
+    assert.equal(result.checks[101][51].status, 'reviewed');
+    assert.equal(result.aggregate[101], 'reviewed');
+    assert.equal(result.aggregate[102], 'issue');
   } finally {
     restores.reverse().forEach((restore) => restore());
   }

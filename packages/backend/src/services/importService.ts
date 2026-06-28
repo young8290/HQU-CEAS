@@ -2,29 +2,25 @@ import prisma from '../config/database.js';
 import ExcelJS from 'exceljs';
 import { calculateAcademicScore, calculateSportsBaseScore, type GradeStage } from '../utils/calculation.js';
 import * as scoreService from './scoreService.js';
+import type { ScoreCategory } from '../config/scoreRules.js';
 
-// Safely read cell value as string (handles null, number, richText, formula)
 function cellText(cell: ExcelJS.Cell): string {
-  const v = cell.value;
-  if (v === null || v === undefined) return '';
-  if (typeof v === 'object' && 'richText' in v) {
-    return (v as any).richText.map((r: any) => r.text).join('').trim();
+  const value = cell.value;
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'object' && 'richText' in value) {
+    return value.richText.map((item: any) => item.text).join('').trim();
   }
-  if (typeof v === 'object' && 'result' in v) {
-    const r = (v as any).result;
-    return r != null ? String(r).trim() : '';
+  if (typeof value === 'object' && 'result' in value) {
+    const result = value.result;
+    return result == null ? '' : String(result).trim();
   }
-  return String(v).trim();
+  return String(value).trim();
 }
 
 export function resolveGradeStage(stageText: string): GradeStage {
   const normalized = stageText.trim().toLowerCase();
-  if (normalized.includes('大三') || normalized.includes('三') || normalized === 'junior') {
-    return 'junior';
-  }
-  if (normalized.includes('大二') || normalized.includes('二') || normalized === 'sophomore') {
-    return 'sophomore';
-  }
+  if (normalized.includes('大三') || normalized.includes('junior') || normalized.includes('三')) return 'junior';
+  if (normalized.includes('大二') || normalized.includes('sophomore') || normalized.includes('二')) return 'sophomore';
   return 'freshman';
 }
 
@@ -34,7 +30,6 @@ export function readSportsImportRow(data: {
   physicalTestScore: string;
   peCourseScore: string;
   gradeStage: string;
-  communityScore: string;
 }) {
   const physicalTestScore = parseFloat(data.physicalTestScore);
   if (Number.isNaN(physicalTestScore)) {
@@ -46,19 +41,21 @@ export function readSportsImportRow(data: {
     throw new Error(`体育课成绩无效: ${data.peCourseScore}`);
   }
 
-  const communityScore = data.communityScore ? parseFloat(data.communityScore) : undefined;
-  if (data.communityScore && Number.isNaN(communityScore)) {
-    throw new Error(`社区表现分无效: ${data.communityScore}`);
-  }
-
   return {
     studentNo: data.studentNo,
     name: data.name,
     physicalTestScore,
     peCourseScore,
     gradeStage: resolveGradeStage(data.gradeStage),
-    communityScore,
   };
+}
+
+async function findStudent(studentNo: string) {
+  return prisma.student.findUnique({ where: { studentNo } });
+}
+
+async function getCurrentYearId(academicYearId: number) {
+  return academicYearId;
 }
 
 export async function importAcademicScores(buffer: Buffer, academicYearId: number, userId: number, classId?: number) {
@@ -71,32 +68,27 @@ export async function importAcademicScores(buffer: Buffer, academicYearId: numbe
   let failCount = 0;
   const failures: any[] = [];
 
-  for (let rowNum = 2; rowNum <= worksheet.rowCount; rowNum++) {
+  for (let rowNum = 2; rowNum <= worksheet.rowCount; rowNum += 1) {
     const row = worksheet.getRow(rowNum);
     const studentNo = cellText(row.getCell(1));
-    const name = cellText(row.getCell(2));
     const gpaStr = cellText(row.getCell(6));
-
     if (!studentNo) continue;
 
     try {
       const gpa = parseFloat(gpaStr);
-      if (isNaN(gpa)) {
-        failCount++;
-        failures.push({ row: rowNum, studentNo, name, reason: `绩点值无效: ${gpaStr}` });
+      if (Number.isNaN(gpa)) {
+        failCount += 1;
+        failures.push({ row: rowNum, studentNo, name: cellText(row.getCell(2)), reason: `绩点值无效: ${gpaStr}` });
         continue;
       }
 
-      const student = await prisma.student.findUnique({ where: { studentNo } });
+      const student = await findStudent(studentNo);
       if (!student) {
-        failCount++;
-        failures.push({ row: rowNum, studentNo, name, reason: '学号不存在' });
+        failCount += 1;
+        failures.push({ row: rowNum, studentNo, name: cellText(row.getCell(2)), reason: '学号不存在' });
         continue;
       }
-
-      if (classId && student.classId !== classId) {
-        continue; // Skip students not in the target class
-      }
+      if (classId && student.classId !== classId) continue;
 
       const academicScore = calculateAcademicScore(gpa);
       await scoreService.updateScore({
@@ -106,19 +98,18 @@ export async function importAcademicScores(buffer: Buffer, academicYearId: numbe
         value: academicScore,
         updatedBy: userId,
       });
-
-      successCount++;
-    } catch (err: any) {
-      failCount++;
-      failures.push({ row: rowNum, studentNo, name, reason: err.message });
+      successCount += 1;
+    } catch (error: any) {
+      failCount += 1;
+      failures.push({ row: rowNum, studentNo, name: cellText(row.getCell(2)), reason: error.message });
     }
   }
 
-  // Save import log
   await prisma.importLog.create({
     data: {
       type: 'academic',
       filename: 'academic_import.xlsx',
+      academicYearId,
       successCount,
       failCount,
       failDetails: JSON.stringify(failures),
@@ -139,68 +130,34 @@ export async function importSportsScores(buffer: Buffer, academicYearId: number,
   let failCount = 0;
   const failures: any[] = [];
 
-  for (let rowNum = 2; rowNum <= worksheet.rowCount; rowNum++) {
+  for (let rowNum = 2; rowNum <= worksheet.rowCount; rowNum += 1) {
     const row = worksheet.getRow(rowNum);
     const studentNo = cellText(row.getCell(1));
-    const name = cellText(row.getCell(2));
-    const physicalTestStr = cellText(row.getCell(3)) || cellText(row.getCell(8));
-    const peCourseStr = cellText(row.getCell(4));
-    const gradeStageText = cellText(row.getCell(5));
-    const communityScoreStr = cellText(row.getCell(6));
-
     if (!studentNo) continue;
 
     try {
       const imported = readSportsImportRow({
         studentNo,
-        name,
-        physicalTestScore: physicalTestStr,
-        peCourseScore: peCourseStr,
-        gradeStage: gradeStageText,
-        communityScore: communityScoreStr,
+        name: cellText(row.getCell(2)),
+        physicalTestScore: cellText(row.getCell(3)),
+        peCourseScore: cellText(row.getCell(4)),
+        gradeStage: cellText(row.getCell(5)),
       });
 
-      const student = await prisma.student.findUnique({ where: { studentNo } });
+      const student = await findStudent(studentNo);
       if (!student) {
-        failCount++;
-        failures.push({ row: rowNum, studentNo, name, reason: '学号不存在' });
+        failCount += 1;
+        failures.push({ row: rowNum, studentNo, name: imported.name, reason: '学号不存在' });
         continue;
       }
-
-      if (classId && student.classId !== classId) {
-        continue; // Skip students not in the target class
-      }
+      if (classId && student.classId !== classId) continue;
 
       const sportsBase = calculateSportsBaseScore({
         gradeStage: imported.gradeStage,
         physicalTestScore: imported.physicalTestScore,
         peCourseScore: imported.peCourseScore,
       });
-      await scoreService.updateScore({
-        studentId: student.id,
-        academicYearId,
-        category: 'physical_test',
-        value: imported.physicalTestScore,
-        updatedBy: userId,
-      });
-      if (imported.peCourseScore !== undefined) {
-        await scoreService.updateScore({
-          studentId: student.id,
-          academicYearId,
-          category: 'pe_course',
-          value: imported.peCourseScore,
-          updatedBy: userId,
-        });
-      }
-      if (imported.communityScore !== undefined) {
-        await scoreService.updateScore({
-          studentId: student.id,
-          academicYearId,
-          category: 'community',
-          value: imported.communityScore,
-          updatedBy: userId,
-        });
-      }
+
       await scoreService.updateScore({
         studentId: student.id,
         academicYearId,
@@ -208,11 +165,10 @@ export async function importSportsScores(buffer: Buffer, academicYearId: number,
         value: sportsBase,
         updatedBy: userId,
       });
-
-      successCount++;
-    } catch (err: any) {
-      failCount++;
-      failures.push({ row: rowNum, studentNo, name, reason: err.message });
+      successCount += 1;
+    } catch (error: any) {
+      failCount += 1;
+      failures.push({ row: rowNum, studentNo, name: cellText(row.getCell(2)), reason: error.message });
     }
   }
 
@@ -221,7 +177,7 @@ export async function importSportsScores(buffer: Buffer, academicYearId: number,
       type: 'sports',
       filename: 'sports_import.xlsx',
       academicYearId,
-      sourceType: 'sports_extended',
+      sourceType: 'sports_basic',
       successCount,
       failCount,
       failDetails: JSON.stringify(failures),
@@ -230,6 +186,34 @@ export async function importSportsScores(buffer: Buffer, academicYearId: number,
   });
 
   return { successCount, failCount, failures };
+}
+
+const PERSONAL_FORM_SHEETS: Array<{ sheetName: string; category: ScoreCategory }> = [
+  { sheetName: '德育测评', category: 'moral' },
+  { sheetName: '创新与实践能力', category: 'innovation' },
+  { sheetName: '体育奖励分', category: 'sports_reward' },
+  { sheetName: '美育', category: 'aesthetics' },
+  { sheetName: '劳动教育', category: 'labor' },
+  { sheetName: '公益服务与社会工作', category: 'public_service' },
+  { sheetName: '附加分', category: 'bonus' },
+];
+
+function readPersonalDetailRows(worksheet: ExcelJS.Worksheet) {
+  const items: Array<{ itemName: string; itemScore: number }> = [];
+  for (let row = 5; row <= 19; row += 1) {
+    const itemName = cellText(worksheet.getCell(`A${row}`));
+    const scoreText = cellText(worksheet.getCell(`B${row}`));
+    if (!itemName && !scoreText) continue;
+    if (!itemName || !scoreText) {
+      throw new Error(`${worksheet.name} 第 ${row} 行填写不完整`);
+    }
+    const itemScore = Number.parseFloat(scoreText);
+    if (Number.isNaN(itemScore)) {
+      throw new Error(`${worksheet.name} 第 ${row} 行加分分数无效`);
+    }
+    items.push({ itemName, itemScore });
+  }
+  return items;
 }
 
 export async function importPersonalFormMultiple(files: { buffer: Buffer; originalname: string }[], academicYearId: number, classId: number, userId: number) {
@@ -243,13 +227,12 @@ export async function importPersonalFormMultiple(files: { buffer: Buffer; origin
       totalSuccess += result.successCount;
       totalFail += result.failCount;
       allFailures.push(...result.failures);
-    } catch (err: any) {
-      totalFail++;
-      allFailures.push({ row: 0, studentNo: '', name: file.originalname, reason: err.message });
+    } catch (error: any) {
+      totalFail += 1;
+      allFailures.push({ row: 0, studentNo: '', name: file.originalname, reason: error.message });
     }
   }
 
-  // Save aggregated import log
   await prisma.importLog.create({
     data: {
       type: 'personal_form',
@@ -269,95 +252,59 @@ export async function importPersonalFormMultiple(files: { buffer: Buffer; origin
 export async function importPersonalForm(buffer: Buffer, academicYearId: number, classId: number, userId: number, filename?: string) {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(buffer as any);
-  
+
+  const infoSheet = workbook.getWorksheet('学生信息') || workbook.worksheets[0];
+  if (!infoSheet) throw new Error('Excel文件中没有工作表');
+
+  const studentNo = cellText(infoSheet.getCell('B3'));
+  const studentName = cellText(infoSheet.getCell('D3'));
+  if (!studentNo || studentNo.includes('这里填学号')) {
+    throw new Error('学生信息页缺少学号');
+  }
+
+  const student = await findStudent(studentNo);
+  if (!student) {
+    throw new Error(`学号不存在: ${studentNo}`);
+  }
+  if (student.classId !== classId) {
+    throw new Error('该学生不属于本班');
+  }
+
   let successCount = 0;
   let failCount = 0;
   const failures: any[] = [];
 
-  // Personal form format per worksheet:
-  // Row 1: A1="学号", B1=<student_no>, C1="姓名", D1=<student_name>
-  // Row 2: Headers - B2="德育测评", C2="创新与实践能力", D2="体育附加分", E2="美育", F2="劳动教育", G2="公益服务与社会工作", H2="附加分"
-  // Row 3: A3="分数（只填数字）", B3-H3 = numeric scores
-  // Row 4: A4="备注", B4-H4 = remark text
+  for (const { sheetName, category } of PERSONAL_FORM_SHEETS) {
+    const worksheet = workbook.getWorksheet(sheetName);
+    if (!worksheet) {
+      failCount += 1;
+      failures.push({ row: 0, studentNo, name: studentName, reason: `缺少工作表: ${sheetName}` });
+      continue;
+    }
 
-  const columnMapping: Array<{ col: number; category: string }> = [
-    { col: 2, category: 'moral' },        // B: 德育测评（100分）
-    { col: 3, category: 'innovation' },    // C: 创新与实践能力（13分）
-    { col: 4, category: 'sports_reward' }, // D: 体育附加分（3分）
-    { col: 5, category: 'aesthetics' },    // E: 美育（6分）
-    { col: 6, category: 'labor' },         // F: 劳动教育（4分）
-    { col: 7, category: 'public_service' },// G: 公益服务与社会工作（10分）
-    { col: 8, category: 'bonus' },         // H: 附加分（5分）
-  ];
-
-  for (const worksheet of workbook.worksheets) {
     try {
-      // Read student info from Row 1
-      const studentNo = cellText(worksheet.getCell('B1'));
-      const studentName = cellText(worksheet.getCell('D1'));
-
-      if (!studentNo || ['学号填这里', '这里填学号'].includes(studentNo)) {
-        // Skip template placeholder sheets silently
-        continue;
-      }
-
-      const student = await prisma.student.findUnique({ where: { studentNo } });
-      if (!student) {
-        failCount++;
-        failures.push({ row: 0, studentNo, name: studentName, reason: '学号不存在' });
-        continue;
-      }
-
-      if (student.classId !== classId) {
-        failCount++;
-        failures.push({ row: 0, studentNo, name: studentName, reason: '该学生不属于本班' });
-        continue;
-      }
-
-      // Read scores from Row 3 and remarks from Row 4
-      const scoreRow = worksheet.getRow(3);
-      const remarkRow = worksheet.getRow(4);
-
-      for (const mapping of columnMapping) {
-        const scoreCell = scoreRow.getCell(mapping.col);
-        const remarkCell = remarkRow.getCell(mapping.col);
-
-        // Robustly read score: handle both numeric and text cells
-        let val: number;
-        const rawValue = scoreCell.value;
-        if (typeof rawValue === 'number') {
-          val = rawValue;
-        } else {
-          val = parseFloat(cellText(scoreCell));
-        }
-
-        const remarkText = cellText(remarkCell);
-
-        if (!isNaN(val)) {
-          await scoreService.updateScore({
-            studentId: student.id,
-            academicYearId,
-            category: mapping.category as any,
-            value: val,
-            remark: remarkText || null,
-            updatedBy: userId,
-          });
-        }
-      }
-
-      successCount++;
-    } catch (err: any) {
-      failCount++;
-      failures.push({ row: 0, studentNo: '', name: worksheet.name, reason: err.message });
+      const items = readPersonalDetailRows(worksheet);
+      await scoreService.saveScoreBonusDetails({
+        studentId: student.id,
+        academicYearId: await getCurrentYearId(academicYearId),
+        category,
+        items,
+        updatedBy: userId,
+      });
+      successCount += 1;
+    } catch (error: any) {
+      failCount += 1;
+      failures.push({ row: 0, studentNo, name: studentName, reason: error.message });
     }
   }
 
-  // Only save individual import log when called standalone (not from batch)
   if (!filename) {
     await prisma.importLog.create({
       data: {
         type: 'personal_form',
         filename: 'personal_form_import.xlsx',
+        academicYearId,
+        sourceType: 'personal_form',
         successCount,
         failCount,
         failDetails: JSON.stringify(failures),

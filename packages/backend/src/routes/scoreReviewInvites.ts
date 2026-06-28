@@ -104,6 +104,17 @@ router.get('/:classId/logs', monitorClassCheck, async (req: Request, res: Respon
   }
 });
 
+router.get('/:classId/checks', monitorClassCheck, async (req: Request, res: Response) => {
+  try {
+    res.json(await scoreReviewInviteService.getClassReviewChecks({
+      academicYearId: await resolveYearId(req.query.academicYearId),
+      classId: parseInt(req.params.classId as string),
+    }));
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 router.get('/:classId', monitorClassCheck, async (req: Request, res: Response) => {
   try {
     res.json(await scoreReviewInviteService.listInvites({

@@ -4,8 +4,8 @@ export const SCORE_CATEGORIES = {
   moral: { label: '德育测评', maxValue: 100, editable: true, editableBy: 'all' as const, step: 1 },
   academic: { label: '学业学术素质', maxValue: 60, editable: true, editableBy: 'admin' as const, step: 0.01 },
   innovation: { label: '创新与实践能力', maxValue: 13, editable: true, editableBy: 'all' as const, step: 0.1 },
-  physical_test: { label: '体测成绩', maxValue: 100, editable: true, editableBy: 'admin' as const, step: 0.01 },
-  pe_course: { label: '体育课成绩', maxValue: 100, editable: true, editableBy: 'admin' as const, step: 0.01 },
+  physical_test: { label: '体测成绩', maxValue: 100, editable: false, editableBy: 'none' as const, step: 0.01 },
+  pe_course: { label: '体育课成绩', maxValue: 100, editable: false, editableBy: 'none' as const, step: 0.01 },
   sports_base: { label: '体育基础分', maxValue: null, editable: true, editableBy: 'admin' as const, step: 0.01 },
   sports_reward: { label: '体育奖励分', maxValue: 3, editable: true, editableBy: 'all' as const, step: 0.01 },
   sports_total: { label: '体育总分', maxValue: 7, editable: false, editableBy: 'none' as const, step: 0.01 },
@@ -19,11 +19,43 @@ export const SCORE_CATEGORIES = {
 
 export type ScoreCategory = keyof typeof SCORE_CATEGORIES;
 
+export const EVALUATION_SCORE_CATEGORIES_ORDER = [
+  'moral',
+  'academic',
+  'innovation',
+  'sports_base',
+  'sports_reward',
+  'sports_total',
+  'aesthetics',
+  'labor',
+  'public_service',
+  'bonus',
+  'total',
+] as const satisfies ReadonlyArray<ScoreCategory>;
+
+export const DECLARATION_SCORE_CATEGORIES_ORDER = [
+  'academic',
+  'sports_base',
+  'community',
+  'total',
+] as const satisfies ReadonlyArray<ScoreCategory>;
+
+export const PERSONAL_FORM_DETAIL_CATEGORIES = [
+  'moral',
+  'innovation',
+  'sports_reward',
+  'aesthetics',
+  'labor',
+  'public_service',
+  'bonus',
+] as const satisfies ReadonlyArray<ScoreCategory>;
+
 export const EDITABLE_CATEGORIES: ScoreCategory[] = Object.entries(SCORE_CATEGORIES)
   .filter(([, v]) => v.editable)
   .map(([k]) => k as ScoreCategory);
 
 export const ALL_CATEGORIES: ScoreCategory[] = Object.keys(SCORE_CATEGORIES) as ScoreCategory[];
+export const SCORE_CATEGORIES_ORDER: ScoreCategory[] = [...EVALUATION_SCORE_CATEGORIES_ORDER];
 
 export function validateScoreValue(category: ScoreCategory, value: number): string | null {
   if (isNaN(value)) return `${SCORE_CATEGORIES[category].label}必须为有效数字`;

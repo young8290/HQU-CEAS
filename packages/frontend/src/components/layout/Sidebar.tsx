@@ -82,6 +82,7 @@ const navItems: NavItem[] = [
   { name: '本班综测总览', href: '/monitor/dashboard', icon: <IconDashboard />, scope: 'evaluation', monitorOnly: true },
   { name: '分数管理', href: '/scores', icon: <IconScores />, scope: 'evaluation', adminOnly: true },
   { name: '本班综测', href: '/monitor/scores', icon: <IconScores />, scope: 'evaluation', monitorOnly: true },
+  { name: '审核小组确认', href: '/monitor/score-review', icon: <IconDeclaration />, scope: 'evaluation', monitorOnly: true },
   { name: '学生管理', href: '/students', icon: <IconStudents />, scope: 'evaluation', adminOnly: true },
   { name: '数据导入', href: '/import', icon: <IconImport />, scope: 'evaluation' },
   { name: '附件导出', href: '/export', icon: <IconExport />, scope: 'evaluation' },

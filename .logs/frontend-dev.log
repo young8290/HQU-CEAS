@@ -1,0 +1,31 @@
+
+> comprehensive-eval-monorepo@1.0.0 dev:frontend
+> npm run dev -w packages/frontend
+
+
+> comprehensive-eval-frontend@1.0.0 dev
+> vite --port 3000
+
+
+  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m1139[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m3000[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://100.67.13.68:[1m3000[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.3.9:[1m3000[22m/[39m
+[2m02:25:18[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx, /src/components/scores/ScoreEditor.tsx[22m
+[2m02:40:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[2m02:40:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[2m02:41:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[2m02:41:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/import/ImportPage.tsx[22m
+[2m02:42:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[2m02:44:27[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/hooks/useScores.ts[22m
+[2m02:46:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[2m02:47:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[2m02:48:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/import/ImportPage.tsx[22m
+[2m03:12:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[2m03:13:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[2m03:14:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreEditor.tsx[22m
+[2m03:14:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[2m03:15:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/ScoreReviewMemberPage.tsx[22m
+[2m03:16:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m
+[2m03:16:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles/global.css, /src/components/scores/MonitorScoreReviewPage.tsx[22m

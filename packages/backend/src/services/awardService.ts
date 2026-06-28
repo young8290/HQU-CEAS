@@ -77,7 +77,7 @@ export async function getAwardCandidates(data: {
         academicRank: academicRanks[student.id] || classSize,
         totalRank: totalRanks[student.id] || classSize,
         moralScore: scoreValue(scores, 'moral'),
-        physicalTestScore: scoreValue(scores, 'physical_test'),
+        sportsBaseScore: scoreValue(scores, 'sports_base'),
         communityScore: scoreValue(scores, 'community'),
         tags,
       }, awardType);
@@ -93,7 +93,7 @@ export async function getAwardCandidates(data: {
         totalRank: totalRanks[student.id] || classSize,
         totalScore: scoreValue(scores, 'total'),
         moralScore: scoreValue(scores, 'moral'),
-        physicalTestScore: scoreValue(scores, 'physical_test'),
+        sportsBaseScore: scoreValue(scores, 'sports_base'),
         communityScore: scoreValue(scores, 'community'),
         tags,
         ...evaluation,

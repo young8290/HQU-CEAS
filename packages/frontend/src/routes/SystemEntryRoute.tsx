@@ -78,7 +78,7 @@ export default function SystemEntryRoute() {
             onGuideOpen={setGuide}
             items={user?.role === 'admin'
               ? ['综测总览', '分数管理', '学生管理', '数据导入', '附件导出']
-              : ['本班综测总览', '本班综测', '综测审核小组签名', '账号设置']}
+              : ['本班综测总览', '本班综测', '审核小组确认', '账号设置']}
           />
           <EntryCard
             title="奖学金与荣誉称号申报系统"

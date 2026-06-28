@@ -1,4 +1,4 @@
-import { getToken } from './auth';
+import { getReviewToken, getToken } from './auth';
 
 type MessageHandler = (data: any) => void;
 
@@ -7,14 +7,22 @@ class WebSocketClient {
   private handlers: Map<string, Set<MessageHandler>> = new Map();
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private classId: number | null = null;
+  private shouldReconnect = false;
+
+  constructor(private readonly tokenProvider: () => string | null) {}
 
   connect() {
-    const token = getToken();
+    const token = this.tokenProvider();
     if (!token) return;
+    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+      return;
+    }
+
+    this.shouldReconnect = true;
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    this.ws = new WebSocket(`${protocol}//${host}/ws?token=${token}`);
+    this.ws = new WebSocket(`${protocol}//${host}/ws?token=${encodeURIComponent(token)}`);
 
     this.ws.onopen = () => {
       console.log('WebSocket connected');
@@ -36,6 +44,8 @@ class WebSocketClient {
     };
 
     this.ws.onclose = () => {
+      this.ws = null;
+      if (!this.shouldReconnect) return;
       console.log('WebSocket disconnected, reconnecting in 3s...');
       this.reconnectTimer = setTimeout(() => this.connect(), 3000);
     };
@@ -46,6 +56,7 @@ class WebSocketClient {
   }
 
   disconnect() {
+    this.shouldReconnect = false;
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
@@ -59,7 +70,9 @@ class WebSocketClient {
   send(data: any) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data));
+      return true;
     }
+    return false;
   }
 
   joinClass(classId: number) {
@@ -68,7 +81,7 @@ class WebSocketClient {
   }
 
   updateScore(studentId: number, category: string, value: number, remark?: string, academicYearId?: number) {
-    this.send({
+    return this.send({
       type: 'score:update',
       studentId,
       category,
@@ -79,7 +92,7 @@ class WebSocketClient {
   }
 
   updateReviewCheck(studentId: number, status: 'pending' | 'reviewed' | 'issue', remark?: string) {
-    this.send({
+    return this.send({
       type: 'score-review:check:update',
       studentId,
       status,
@@ -103,4 +116,5 @@ class WebSocketClient {
   }
 }
 
-export const wsClient = new WebSocketClient();
+export const wsClient = new WebSocketClient(getToken);
+export const reviewWsClient = new WebSocketClient(getReviewToken);

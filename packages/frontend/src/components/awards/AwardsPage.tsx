@@ -19,7 +19,7 @@ interface Candidate {
   totalRank: number;
   totalScore: number;
   moralScore: number;
-  physicalTestScore: number;
+  sportsBaseScore: number;
   communityScore: number;
   blockedReasons: string[];
   tags: string[];
@@ -161,7 +161,7 @@ export default function AwardsPage() {
                 <th className="px-3 py-2">学习排名</th>
                 <th className="px-3 py-2">综测排名</th>
                 <th className="px-3 py-2">德育</th>
-                <th className="px-3 py-2">体测</th>
+                <th className="px-3 py-2">体育基础分</th>
                 <th className="px-3 py-2">社区</th>
                 <th className="px-3 py-2">状态</th>
               </tr>
@@ -185,7 +185,7 @@ export default function AwardsPage() {
                   <td className="px-3 py-2 tabular-nums">{item.academicRank}</td>
                   <td className="px-3 py-2 tabular-nums">{item.totalRank}</td>
                   <td className="px-3 py-2 tabular-nums">{item.moralScore}</td>
-                  <td className="px-3 py-2 tabular-nums">{item.physicalTestScore}</td>
+                  <td className="px-3 py-2 tabular-nums">{item.sportsBaseScore}</td>
                   <td className="px-3 py-2 tabular-nums">{item.communityScore}</td>
                   <td className="px-3 py-2">
                     <StatusChip label={item.eligible ? '可申报' : item.blockedReasons[0] || '未通过'} tone={item.eligible ? 'success' : 'danger'} />

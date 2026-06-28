@@ -13,7 +13,7 @@ const baseCandidate: AwardCandidateInput = {
   academicRank: 20,
   totalRank: 25,
   moralScore: 95,
-  physicalTestScore: 70,
+  sportsBaseScore: 70,
   communityScore: 99,
   tags: [],
 };

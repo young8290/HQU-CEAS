@@ -11,7 +11,7 @@ export interface HonorCandidateInput {
   academicRank: number;
   totalRank: number;
   moralScore: number;
-  physicalTestScore: number;
+  sportsBaseScore: number;
   communityScore: number;
   tags: string[];
   hasClassHonorQuotaBonus?: boolean;
@@ -49,7 +49,7 @@ export function evaluateHonorCandidate(
     conditionResults.push(
       check('scholarship_tag', '奖学金标签', input.tags.some((tag) => tag.includes('scholarship')), input.tags.join('、') || '无', '获得指定奖学金'),
       check('total_rank', '综测排名', input.totalRank <= totalLimit, input.totalRank, `班级前 ${totalLimit} 名`),
-      check('physical_test', '体测成绩', input.physicalTestScore >= 80, input.physicalTestScore, '不低于 80 分'),
+      check('sports_base', '体育基础分', input.sportsBaseScore >= 80, input.sportsBaseScore, '不低于 80 分'),
     );
   }
 

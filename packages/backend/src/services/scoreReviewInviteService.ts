@@ -281,16 +281,25 @@ export async function loginByInvite(data: {
   };
 }
 
-function buildCheckMaps(checks: Array<{ studentId: number; memberId: number; status: string; remark: string | null; checkedAt: Date | null; updatedAt: Date }>, memberIds: number[]) {
+function buildCheckMaps(
+  checks: Array<{ studentId: number; memberId: number; status: string; remark: string | null; checkedAt: Date | null; updatedAt: Date }>,
+  memberIds: number[],
+  studentIds: number[] = [],
+) {
   const byStudent: Record<number, any> = {};
   const aggregate: Record<number, string> = {};
   for (const check of checks) {
     byStudent[check.studentId] = byStudent[check.studentId] || {};
     byStudent[check.studentId][check.memberId] = check;
   }
-  for (const [studentIdText, memberChecks] of Object.entries(byStudent)) {
+  const allStudentIds = new Set([
+    ...studentIds,
+    ...Object.keys(byStudent).map((studentId) => Number(studentId)),
+  ]);
+  for (const studentId of allStudentIds) {
+    const memberChecks = byStudent[studentId] || {};
     const values = memberIds.map((memberId) => memberChecks[memberId]?.status || 'pending');
-    aggregate[Number(studentIdText)] = values.includes('issue')
+    aggregate[studentId] = values.includes('issue')
       ? 'issue'
       : values.every((status) => status === 'reviewed')
         ? 'reviewed'
@@ -307,7 +316,7 @@ export async function getReviewerSession(payload: TokenPayload) {
     getClassLogs(invite.record.classId, invite.record.academicYearId),
   ]);
   const memberIds = invite.record.members.map((member) => member.id);
-  const maps = buildCheckMaps(checks, memberIds);
+  const maps = buildCheckMaps(checks, memberIds, students.map((student: any) => student.id));
   return {
     inviteId: invite.id,
     record: invite.record,
@@ -317,6 +326,38 @@ export async function getReviewerSession(payload: TokenPayload) {
     checks: maps.byStudent,
     aggregate: maps.aggregate,
     logs: logs.data,
+  };
+}
+
+export async function getClassReviewChecks(data: {
+  academicYearId: number;
+  classId: number;
+}) {
+  const record = await getRecordByClass(data.academicYearId, data.classId);
+  const [students, checks] = await Promise.all([
+    prisma.student.findMany({
+      where: { classId: data.classId },
+      orderBy: [{ studentNo: 'asc' }],
+      select: { id: true, studentNo: true, name: true },
+    }),
+    prisma.scoreReviewStudentCheck.findMany({
+      where: { recordId: record.id },
+    }),
+  ]);
+  const memberIds = record.members.map((member: any) => member.id);
+  const maps = buildCheckMaps(checks, memberIds, students.map((student) => student.id));
+  return {
+    recordId: record.id,
+    members: record.members.map((member: any) => ({
+      id: member.id,
+      name: member.name,
+      roleName: member.roleName,
+      signatureFileId: member.signatureFileId,
+      signedAt: member.signedAt,
+    })),
+    students,
+    checks: maps.byStudent,
+    aggregate: maps.aggregate,
   };
 }
 

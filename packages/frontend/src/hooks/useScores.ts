@@ -8,17 +8,26 @@ interface ScoreData {
   remark: string | null;
 }
 
+export interface ScoreDetailData {
+  id?: number;
+  itemName: string;
+  itemScore: number;
+  sortOrder?: number;
+}
+
 interface StudentScore {
   id: number;
   studentNo: string;
   name: string;
   scores: Record<string, ScoreData>;
+  details?: Record<string, ScoreDetailData[]>;
 }
 
 export function useScores(classId: number | null) {
   const [students, setStudents] = useState<StudentScore[]>([]);
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<string>('');
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
@@ -26,6 +35,7 @@ export function useScores(classId: number | null) {
   const loadScores = useCallback(async () => {
     if (!classId) return;
     setLoading(true);
+    setSaveError(null);
     try {
       const data = await api.get(`/scores/class/${classId}`);
       setStudents(data);
@@ -49,12 +59,17 @@ export function useScores(classId: number | null) {
 
     const handleUpdated = (data: any) => {
       setSaveStatus('saved');
+      setSaveError(null);
       setLastSaved(new Date().toLocaleTimeString());
       // Update local state with new scores
       setStudents((prev) =>
         prev.map((s) => {
           if (s.id === data.studentId) {
-            return { ...s, scores: { ...s.scores, ...data.scores } };
+            return {
+              ...s,
+              scores: { ...s.scores, ...data.scores },
+              details: data.details ? { ...s.details, [data.category]: data.details } : s.details,
+            };
           }
           return s;
         })
@@ -65,7 +80,11 @@ export function useScores(classId: number | null) {
       setStudents((prev) =>
         prev.map((s) => {
           if (s.id === data.studentId) {
-            return { ...s, scores: { ...s.scores, ...data.scores } };
+            return {
+              ...s,
+              scores: { ...s.scores, ...data.scores },
+              details: data.details ? { ...s.details, [data.category]: data.details } : s.details,
+            };
           }
           return s;
         })
@@ -74,6 +93,7 @@ export function useScores(classId: number | null) {
 
     const handleError = (data: any) => {
       setSaveStatus('error');
+      setSaveError(data.error || '保存失败');
       console.error('Score save error:', data.error);
     };
 
@@ -95,8 +115,10 @@ export function useScores(classId: number | null) {
       const error = validateScore(category, value);
       if (error) {
         setSaveStatus('error');
+        setSaveError(error);
         return error;
       }
+      setSaveError(null);
 
       // Optimistic update
       setStudents((prev) =>
@@ -119,10 +141,29 @@ export function useScores(classId: number | null) {
 
       debounceTimers.current.set(
         key,
-        setTimeout(() => {
+        setTimeout(async () => {
           setSaveStatus('saving');
-          wsClient.updateScore(studentId, category, value, remark);
-          debounceTimers.current.delete(key);
+          try {
+            const sent = wsClient.updateScore(studentId, category, value, remark);
+            if (!sent) {
+              const data = await api.put('/scores', { studentId, category, value, remark });
+              setStudents((prev) =>
+                prev.map((s) => (
+                  s.id === studentId
+                    ? { ...s, scores: { ...s.scores, ...data } }
+                    : s
+                ))
+              );
+              setSaveStatus('saved');
+              setSaveError(null);
+              setLastSaved(new Date().toLocaleTimeString());
+            }
+          } catch (error: any) {
+            setSaveStatus('error');
+            setSaveError(error.message || '保存失败');
+          } finally {
+            debounceTimers.current.delete(key);
+          }
         }, 300)
       );
 
@@ -164,13 +205,50 @@ export function useScores(classId: number | null) {
     [students]
   );
 
+  const loadScoreDetails = useCallback(async (studentId: number, category: string) => {
+    if (!classId) return [];
+    const data = await api.get<{ details: ScoreDetailData[] }>(`/scores/student/${studentId}/${category}/details`);
+    return data.details || [];
+  }, [classId]);
+
+  const saveScoreDetails = useCallback(async (studentId: number, category: string, items: ScoreDetailData[]) => {
+    if (!classId) return null;
+    setSaveStatus('saving');
+    setSaveError(null);
+    try {
+      const data = await api.put(`/scores/student/${studentId}/${category}/details`, { items });
+      setSaveStatus('saved');
+      setLastSaved(new Date().toLocaleTimeString());
+      setStudents((prev) =>
+        prev.map((s) => {
+          if (s.id === studentId) {
+            return {
+              ...s,
+              scores: { ...s.scores, ...data.scores },
+              details: { ...s.details, [category]: data.details },
+            };
+          }
+          return s;
+        })
+      );
+      return data;
+    } catch (error: any) {
+      setSaveStatus('error');
+      setSaveError(error.message || '保存失败');
+      throw error;
+    }
+  }, [classId]);
+
   return {
     students,
     loading,
     saveStatus,
+    saveError,
     lastSaved,
     updateScore,
     updateRemark,
+    loadScoreDetails,
+    saveScoreDetails,
     loadScores,
   };
 }

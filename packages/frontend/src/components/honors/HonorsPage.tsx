@@ -24,7 +24,7 @@ interface Candidate {
   academicRank: number;
   totalRank: number;
   moralScore: number;
-  physicalTestScore: number;
+  sportsBaseScore: number;
   communityScore: number;
   recommendationLevel?: string;
   recommendationSource?: string;
@@ -226,7 +226,7 @@ export default function HonorsPage() {
                   <th className="px-3 py-2">学习排名</th>
                   <th className="px-3 py-2">综测排名</th>
                   <th className="px-3 py-2">社区</th>
-                  <th className="px-3 py-2">体测</th>
+                  <th className="px-3 py-2">体育基础分</th>
                   <th className="px-3 py-2">申报级别</th>
                   {honorType === 'excellent_cadre' && <th className="px-3 py-2">推荐来源</th>}
                   {honorType === 'excellent_cadre' && <th className="px-3 py-2">任职情况</th>}
@@ -253,7 +253,7 @@ export default function HonorsPage() {
                     <td className="px-3 py-2 tabular-nums">{item.academicRank}</td>
                     <td className="px-3 py-2 tabular-nums">{item.totalRank}</td>
                     <td className="px-3 py-2 tabular-nums">{item.communityScore}</td>
-                    <td className="px-3 py-2 tabular-nums">{item.physicalTestScore}</td>
+                    <td className="px-3 py-2 tabular-nums">{item.sportsBaseScore}</td>
                     <td className="px-3 py-2">
                       <select
                         value={levels[item.studentId] || '院级'}

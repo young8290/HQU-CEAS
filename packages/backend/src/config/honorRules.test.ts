@@ -12,7 +12,7 @@ const baseCandidate: HonorCandidateInput = {
   academicRank: 25,
   totalRank: 8,
   moralScore: 92,
-  physicalTestScore: 82,
+  sportsBaseScore: 82,
   communityScore: 99,
   tags: ['school_scholarship'],
 };

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import ScreenState from '../components/common/ScreenState';
 import { api } from '../lib/api';
 import { navigateTo } from '../lib/router';
-import { setAuth } from '../lib/auth';
+import { setReviewAuth } from '../lib/auth';
 
 function getReviewDeviceId() {
   const existing = localStorage.getItem('reviewDeviceId');
@@ -27,7 +27,7 @@ export default function ReviewInviteLoginRoute() {
       deviceId: getReviewDeviceId(),
     })
       .then((result) => {
-        setAuth(result.token, result.user);
+        setReviewAuth(result.token, result.user);
         navigateTo('/review/scores', { replace: true });
       })
       .catch((error) => {

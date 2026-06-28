@@ -7,7 +7,7 @@ export interface AwardCandidateInput {
   academicRank: number;
   totalRank: number;
   moralScore: number;
-  physicalTestScore: number;
+  sportsBaseScore: number;
   communityScore: number;
   tags: string[];
 }
@@ -86,7 +86,7 @@ export function evaluateAwardCandidate(
 ): AwardCandidateEvaluation {
   const checks: RuleCheckResult[] = [
     makeCheck('moral_score', '德育分', input.moralScore >= 90, input.moralScore, '不低于 90 分'),
-    makeCheck('physical_test', '体测成绩', input.physicalTestScore >= 60, input.physicalTestScore, '不低于 60 分'),
+    makeCheck('sports_base', '体育基础分', input.sportsBaseScore >= 60, input.sportsBaseScore, '不低于 60 分'),
     makeCheck('community_score', '社区表现分', input.communityScore >= 98, input.communityScore, '不低于 98 分'),
   ];
 
