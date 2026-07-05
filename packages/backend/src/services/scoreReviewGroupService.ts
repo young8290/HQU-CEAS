@@ -137,16 +137,29 @@ export async function signScoreReviewMember(data: {
     where: { id: data.memberId },
     data: { signatureFileId: data.signatureFileId, signedAt: new Date() },
   });
-  const members = await prisma.scoreReviewGroupMember.findMany({ where: { recordId: data.recordId } });
+  const members = await prisma.scoreReviewGroupMember.findMany({
+    where: { recordId: data.recordId },
+    orderBy: { sortOrder: 'asc' },
+  });
   const completed = members.length > 0 && members.every((item) => item.signatureFileId);
   let pdfFileId: number | null = null;
 
   if (completed) {
+    const reviewRecord = await prisma.scoreReviewRecord.findUnique({
+      where: { id: data.recordId },
+      include: { class: { include: { grade: true } }, academicYear: true },
+    });
     const pdf = await generatePdfMaterial({
       pdfType: 'score_review_confirmation',
       businessType: 'score_review',
       businessId: data.recordId,
-      context: { memberCount: members.length },
+      context: {
+        className: reviewRecord ? `${reviewRecord.class.grade.name}${reviewRecord.class.name}` : undefined,
+        academicYear: reviewRecord?.academicYear.name,
+        memberCount: members.length,
+        members: members.map((item) => ({ name: item.name, roleName: item.roleName })),
+        completedAt: new Date(),
+      },
       generatedBy: data.actorId,
       signatureFileIds: members
         .map((item) => item.signatureFileId)

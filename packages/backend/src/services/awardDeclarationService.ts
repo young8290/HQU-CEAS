@@ -105,11 +105,40 @@ export async function submitAwardDeclaration(data: {
     return created;
   });
 
+  const [academicYear, signer] = await Promise.all([
+    prisma.academicYear.findUnique({ where: { id: data.academicYearId } }),
+    prisma.user.findUnique({ where: { id: data.actorId } }),
+  ]);
+  const awardLevelLabels: Record<string, string> = {
+    first: '院一等奖学金',
+    second: '院二等奖学金',
+    third: '院三等奖学金',
+    overseas_third: '境外生院三等奖学金',
+  };
+  const declarationStudents = data.studentSelections.map((selection) => {
+    const candidate = candidateMap.get(selection.studentId);
+    const level = selection.itemLevel || 'third';
+    return {
+      name: candidate?.name ?? '',
+      studentNo: candidate?.studentNo ?? '',
+      award: awardLevelLabels[level] ?? '院三等奖学金',
+      amount: selection.amount ?? 600,
+    };
+  });
+
   const pdf = await generatePdfMaterial({
     pdfType: 'monitor_agreement',
     businessType: 'declaration_batch',
     businessId: batch.id,
-    context: { declarationType: 'award', checklist: data.checklist },
+    context: {
+      declarationType: 'award',
+      className: candidates[0]?.className,
+      academicYear: academicYear?.name,
+      signerName: signer?.displayName || signer?.username,
+      signedAt: new Date().toISOString(),
+      students: declarationStudents,
+      confirmedItems: checklistItems.map((item) => item.label),
+    },
     generatedBy: data.actorId,
     signatureFileIds: [signatureFileId],
   });

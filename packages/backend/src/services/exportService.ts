@@ -10,8 +10,8 @@ import { COLLEGE_AWARD_AMOUNTS } from '../config/awardRules.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// templates/ 在项目根目录: packages/backend/src/services/ -> 往上4级到项目根
-const TEMPLATE_DIR = path.resolve(__dirname, '..', '..', '..', '..', 'templates');
+// templates/ 在后端包根目录: packages/backend/src/services/ -> 往上2级到 packages/backend
+const TEMPLATE_DIR = path.resolve(__dirname, '..', '..', 'templates');
 
 interface FailedRecord {
   row: number;
@@ -133,7 +133,7 @@ export async function exportAttachment2(classId: number, academicYearId: number)
   if (fs.existsSync(templatePath)) {
     await workbook.xlsx.readFile(templatePath);
   } else {
-    throw new Error('附件2模板文件不存在，请将模板放入 templates/附件2_template.xlsx');
+    throw new Error('附件2模板文件不存在，请将模板放入 packages/backend/templates/附件2_template.xlsx');
   }
 
   const sheet = workbook.worksheets[0];
@@ -202,7 +202,7 @@ export async function exportAttachment4(classId: number, academicYearId: number)
   if (fs.existsSync(templatePath)) {
     await workbook.xlsx.readFile(templatePath);
   } else {
-    throw new Error('附件4模板文件不存在，请将模板放入 templates/附件4_template.xlsx');
+    throw new Error('附件4模板文件不存在，请将模板放入 packages/backend/templates/附件4_template.xlsx');
   }
 
   const sheet = workbook.worksheets[0];
@@ -296,7 +296,7 @@ export async function exportDeclarationAttachment2(academicYearId: number): Prom
   const workbook = new ExcelJS.Workbook();
   const templatePath = path.join(TEMPLATE_DIR, declarationSummaryTemplate);
   if (!fs.existsSync(templatePath)) {
-    throw new Error(`附件2申报汇总模板不存在，请将模板放入 templates/${declarationSummaryTemplate}`);
+    throw new Error(`附件2申报汇总模板不存在，请将模板放入 packages/backend/templates/${declarationSummaryTemplate}`);
   }
   await workbook.xlsx.readFile(templatePath);
   const sheet = workbook.getWorksheet('院级奖学金、院优干汇总表') || workbook.worksheets[0];

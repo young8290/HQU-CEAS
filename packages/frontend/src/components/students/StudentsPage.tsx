@@ -132,7 +132,7 @@ export default function StudentsPage() {
       const result = await api.upload(`/students/batch/${selectedClass}`, batchFile);
       setShowBatchModal(false);
       setBatchFile(null);
-      setSuccessMsg(`批量导入成功: 新增${result.added}人, 跳过${result.skipped}人`);
+      setSuccessMsg(`批量导入完成：新增 ${result.added} 人，跳过 ${result.skipped} 人`);
       await loadStudents(selectedClass);
       setTimeout(() => setSuccessMsg(''), 5000);
     } catch (err: any) {
@@ -150,7 +150,7 @@ export default function StudentsPage() {
       const result = await api.upload('/students/batch', globalImportFile);
       setShowGlobalImportModal(false);
       setGlobalImportFile(null);
-      setSuccessMsg(`一键导入成功: 新增${result.added}人, 跳过${result.skipped}人${result.failed ? `, 失败${result.failed}人` : ''}`);
+      setSuccessMsg(`导入完成：新增 ${result.added} 人，跳过 ${result.skipped} 人${result.failed ? `，失败 ${result.failed} 人` : ''}`);
       // Reload grades since new grades/classes may have been created
       await loadGrades();
       setTimeout(() => setSuccessMsg(''), 8000);
@@ -230,7 +230,7 @@ export default function StudentsPage() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><div className="text-neutral-400">加载中...</div></div>;
+    return <div className="flex items-center justify-center h-64"><div className="text-neutral-400">加载中</div></div>;
   }
 
   return (
@@ -238,7 +238,7 @@ export default function StudentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-neutral-950 dark:text-white font-headings">学生管理</h1>
-          <p className="text-neutral-500 dark:text-neutral-400 mt-1">管理年级、班级和学生信息</p>
+          <p className="text-neutral-500 dark:text-neutral-400 mt-1">年级、班级和学生信息。</p>
         </div>
         {isAdmin && (
           <div className="flex gap-2">
@@ -252,7 +252,7 @@ export default function StudentsPage() {
               onClick={() => setShowGlobalImportModal(true)}
               className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white transition-colors hover:bg-[#7c4a34]"
             >
-              一键导入学生
+              导入学生名单
             </button>
           </div>
         )}
@@ -409,7 +409,7 @@ export default function StudentsPage() {
               </tbody>
             </table>
             {students.length === 0 && (
-              <div className="text-center py-12 text-neutral-400">暂无学生，请添加</div>
+              <div className="text-center py-12 text-neutral-400">暂无学生</div>
             )}
           </div>
         </div>
@@ -426,7 +426,7 @@ export default function StudentsPage() {
                 value={newStudentNo}
                 onChange={(e) => setNewStudentNo(e.target.value)}
                 className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
-                placeholder="请输入学号"
+                placeholder="学号"
               />
             </div>
             <div>
@@ -436,7 +436,7 @@ export default function StudentsPage() {
                 value={newStudentName}
                 onChange={(e) => setNewStudentName(e.target.value)}
                 className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
-                placeholder="请输入姓名"
+                placeholder="姓名"
               />
             </div>
             <div className="flex justify-end gap-2">
@@ -452,7 +452,7 @@ export default function StudentsPage() {
         <Modal title="批量导入学生" onClose={() => setShowBatchModal(false)}>
           <div className="space-y-4">
             <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              请上传Excel文件（.xlsx），格式：A列学号，B列姓名。
+              上传 .xlsx 文件：A 列学号，B 列姓名。
             </p>
             <input
               type="file"
@@ -467,7 +467,7 @@ export default function StudentsPage() {
                 disabled={!batchFile || uploading}
                 className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34] disabled:opacity-50"
               >
-                {uploading ? '上传中...' : '导入'}
+                {uploading ? '上传中' : '导入'}
               </button>
             </div>
           </div>
@@ -514,14 +514,13 @@ export default function StudentsPage() {
 
       {/* Global Import Modal */}
       {showGlobalImportModal && (
-        <Modal title="一键导入学生" onClose={() => setShowGlobalImportModal(false)}>
+        <Modal title="导入学生名单" onClose={() => setShowGlobalImportModal(false)}>
           <div className="space-y-4">
             <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              上传Excel文件，格式：A列学号、B列姓名、C列年级（如"2023级"）、D列班级（如"计算机科学与技术1班"）。
-              系统会自动创建不存在的年级和班级。
+              上传 .xlsx 文件：A 列学号、B 列姓名、C 列年级、D 列班级。缺失年级和班级将补建。
             </p>
             <div className="rounded-md border border-sky-200 bg-sky-50 p-3 text-xs text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300">
-              提示：可点击"下载模板"获取标准格式模板
+              可先下载模板。
             </div>
             <input
               type="file"
@@ -536,7 +535,7 @@ export default function StudentsPage() {
                 disabled={!globalImportFile || uploading}
                 className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34] disabled:opacity-50"
               >
-                {uploading ? '导入中...' : '开始导入'}
+                {uploading ? '导入中' : '导入'}
               </button>
             </div>
           </div>

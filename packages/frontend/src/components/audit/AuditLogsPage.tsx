@@ -50,7 +50,7 @@ export default function AuditLogsPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold text-neutral-950 dark:text-white">操作日志</h1>
-        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">查看导入、申报、审核、签名、PDF 和邮件相关操作记录。</p>
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">导入、申报、审核、签名、PDF 和邮件记录。</p>
       </header>
       {message && <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">{message}</div>}
       <DataPanel title="日志列表">

@@ -69,7 +69,7 @@ export default function AwardsPage() {
   }, [allocation]);
   const submitIssues = useMemo(() => {
     const issues: string[] = [];
-    if (!classId) issues.push('当前账号未绑定班级');
+    if (!classId) issues.push('账号未绑定班级');
     if (selectedRows.length === 0) issues.push('至少选择 1 名符合条件的学生');
     const missingChecklist = checklistItems('award')
       .filter(([code]) => !checklist[code])
@@ -79,7 +79,7 @@ export default function AwardsPage() {
     }
     if (!signatureFile?.id) issues.push('班长确认协议签名尚未保存');
     if (allocation?.validation && !allocation.validation.valid) {
-      issues.push(`院奖分配未通过：${(allocation.validation.issues || []).join('、') || '请检查名额、金额和等级人数结构'}`);
+      issues.push(`院奖分配未通过：${(allocation.validation.issues || []).join('、') || '名额、金额或等级人数需核对'}`);
     }
     return issues;
   }, [allocation, checklist, classId, selectedRows.length, signatureFile]);
@@ -117,13 +117,13 @@ export default function AwardsPage() {
         imageData,
       });
       setSignatureFile(saved);
-      setMessage('班长确认协议签名已保存');
+      setMessage('签名已保存');
     } catch (error: any) {
       setMessage(error.message);
     }
   }
 
-  if (loading) return <ScreenState label="奖学金候选加载中..." />;
+  if (loading) return <ScreenState label="奖学金候选加载中" />;
 
   return (
     <div className="space-y-6">
@@ -135,7 +135,7 @@ export default function AwardsPage() {
 
       <DataPanel
         title="院奖分配预览"
-        description="系统按综测总分排序并检查名额、金额和一二三等奖人数结构。"
+        description="按综测总分排序，核对名额、金额和等级人数。"
       >
         <div className="grid gap-3 md:grid-cols-4">
           <Metric label="名额" value={allocation?.quota?.quotaCount ?? '-'} />
@@ -145,13 +145,13 @@ export default function AwardsPage() {
         </div>
         <div className="mt-4">
           <StatusChip
-            label={allocation?.validation?.valid ? '分配校验通过' : '分配校验未通过'}
+            label={allocation?.validation?.valid ? '分配通过' : '分配未通过'}
             tone={allocation?.validation?.valid ? 'success' : 'danger'}
           />
         </div>
       </DataPanel>
 
-      <DataPanel title="候选名单" description="未通过数字条件的学生保留阻止原因，提交时将再次校验。">
+      <DataPanel title="候选名单" description="未通过条件的学生会显示原因。">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="bg-neutral-50 text-xs text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400">
@@ -199,7 +199,7 @@ export default function AwardsPage() {
 
       <DataPanel
         title="班长确认项"
-        description="全部确认项通过后才能提交班级申报。"
+        description="勾选全部确认项后提交。"
         actions={
           <button
             type="button"
@@ -215,7 +215,7 @@ export default function AwardsPage() {
         <Checklist type="award" value={checklist} onChange={setChecklist} />
       </DataPanel>
 
-      <DataPanel title="班长确认协议" description="签名保存后，提交申报时生成并归档确认协议 PDF。">
+      <DataPanel title="班长确认协议" description="签名后生成确认协议 PDF。">
         <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
           <SignaturePad
             signerName={user?.displayName || user?.username || '班长'}
@@ -240,14 +240,14 @@ function SubmitGate({ issues }: { issues: string[] }) {
   if (issues.length === 0) {
     return (
       <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">
-        提交前检查已通过，可以提交班级奖学金申报。
+        申报材料已就绪。
       </div>
     );
   }
 
   return (
     <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300">
-      <p className="font-medium">提交前还需完成以下事项</p>
+      <p className="font-medium">待完成事项</p>
       <ol className="mt-2 list-decimal space-y-1 pl-5">
         {issues.map((issue) => (
           <li key={issue}>{issue}</li>
@@ -269,12 +269,12 @@ function Metric({ label, value }: { label: string; value: string | number }) {
 function PdfState({ declaration }: { declaration: any }) {
   const pdf = declaration?.agreementSignatures?.[0]?.pdfFile;
   if (!pdf) {
-    return <p className="text-sm text-neutral-500">确认协议 PDF：未生成</p>;
+    return <p className="text-sm text-neutral-500">确认协议 PDF 未生成</p>;
   }
 
   return (
     <div className="rounded-lg border border-neutral-200 p-3 text-sm dark:border-neutral-800">
-      <p className="font-medium text-neutral-900 dark:text-white">确认协议 PDF 已归档</p>
+      <p className="font-medium text-neutral-900 dark:text-white">确认协议 PDF 已保存</p>
       <button
         type="button"
         onClick={() => api.download(`/pdf-materials/${pdf.id}/download`, `奖学金确认协议-${pdf.id}.pdf`)}

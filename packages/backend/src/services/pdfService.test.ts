@@ -32,8 +32,41 @@ test('buildPdfBuffer embeds signature image XObject when provided', () => {
   const text = buffer.toString('binary');
 
   assert.match(text, /\/Subtype \/Image/);
-  assert.match(text, /\/Im1 7 0 R/);
+  assert.match(text, /\/Im1 6 0 R/);
   assert.match(text, /\/Filter \/FlateDecode/);
+});
+
+test('buildPdfBuffer does not leak raw enum values into agreement text', () => {
+  const buffer = buildPdfBuffer({
+    pdfType: 'monitor_agreement',
+    businessType: 'declaration_batch',
+    businessId: 5,
+    context: { declarationType: 'honor', honorType: 'excellent_cadre', className: '2023级1班' },
+    signatureImages: [],
+  });
+  // Text is stored as UTF-16 hex, so raw ASCII enum tokens must not appear.
+  const hex = buffer.toString('binary');
+  assert.doesNotMatch(hex, /excellent_cadre/);
+  assert.doesNotMatch(hex, /declarationType/);
+});
+
+test('buildPdfBuffer paginates when content overflows a single page', () => {
+  const students = Array.from({ length: 60 }, (_, index) => ({
+    name: `学生${index + 1}`,
+    studentNo: `2023${String(index).padStart(4, '0')}`,
+    award: '院三等奖学金',
+    amount: 600,
+  }));
+  const buffer = buildPdfBuffer({
+    pdfType: 'monitor_agreement',
+    businessType: 'declaration_batch',
+    businessId: 7,
+    context: { declarationType: 'award', students },
+    signatureImages: [],
+  });
+  const text = buffer.toString('binary');
+  const pageCount = (text.match(/\/Type \/Page[^s]/g) || []).length;
+  assert.ok(pageCount > 1, `expected multiple pages, got ${pageCount}`);
 });
 
 test('canAccessPdfMaterial allows admins before ownership lookup', async () => {

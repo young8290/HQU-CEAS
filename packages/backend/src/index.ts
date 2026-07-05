@@ -87,7 +87,7 @@ app.use('/api/mail/logs', mailLogRoutes);
 
 app.get('/', (req, res) => {
   res.json({
-    name: 'comprehensive-eval-backend',
+    name: 'hqu-ceas-backend',
     status: 'ok',
     health: '/api/health',
   });

@@ -1,379 +1,297 @@
-# HQU-CCES
+# HQU-CEAS
 
-华侨大学计算机科学与技术学院综合素质测评、奖学金与荣誉称号申报管理系统。项目采用 `npm workspaces` 管理前后端代码，前端基于 `Vite`、`React`、`TypeScript` 和 `Tailwind CSS`，后端基于 `Express`、`Prisma`、`SQLite` 和 `WebSocket`。
+> 华侨大学计算机科学与技术学院 · 综合素质测评、奖学金与荣誉称号申报管理系统
+>
+> HQU Comprehensive Evaluation & Awards System (CEAS) for the College of Computer Science and Technology, Huaqiao University.
 
-## 各端功能
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)](https://expressjs.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 
-### 管理员端
+---
 
-| 模块 | 功能 |
-| --- | --- |
-| 系统入口 | 查看综合素质测评填写系统、奖学金与荣誉称号申报系统的入口状态，打开对应操作指南 |
-| 基础数据 | 维护学年、年级、班级、学生、管理员账号、班长账号和系统设置 |
-| 综测数据 | 导入学业成绩、体测与体育课成绩，维护管理员权限范围内的综测分数 |
-| 综测总览 | 查看全院或指定年级、班级的综测数据准备情况和统计信息 |
-| 综测导出 | 导出附件 2、附件 4、全年级附件压缩包、导入失败记录和账号列表 |
-| 申报数据 | 导入外部奖项名单、院奖名额金额、先进班级名单、班长邮箱 |
-| 申报审核 | 查看奖学金与荣誉称号申报批次，核对班长确认协议 PDF，执行退回修改或确认通过 |
-| 申报导出 | 导出申报汇总、院奖分配、荣誉称号明细、附件 2 申报汇总表和邮件发送记录 |
-| 系统支撑 | 配置邮箱、维护邮件模板、查看操作日志和标签视图 |
+## 目录
 
-### 班长端
+- [项目简介](#项目简介)
+- [核心特性](#核心特性)
+- [系统角色](#系统角色)
+- [技术栈](#技术栈)
+- [系统架构](#系统架构)
+- [目录结构](#目录结构)
+- [快速开始](#快速开始)
+- [一键启动(Windows)](#一键启动windows)
+- [环境变量](#环境变量)
+- [常用脚本](#常用脚本)
+- [前端页面路由](#前端页面路由)
+- [API 接口分组](#api-接口分组)
+- [数据与文件](#数据与文件)
+- [构建与部署](#构建与部署)
+- [项目文档](#项目文档)
+- [许可证](#许可证)
 
-| 模块 | 功能 |
-| --- | --- |
-| 本班综测 | 查看本班学生综测分数，编辑允许班级维护的分数组成 |
-| 加分明细 | 维护德育、创新与实践、体育奖励、美育、劳动教育、公益服务、附加分等项目的加分明细 |
-| 综测导入 | 下载并导入个人综测填写表，补充本班同学的可编辑分数 |
-| 综测审核 | 维护班级内部综测审核小组成员，生成每位成员的审核邀请链接 |
-| 审核进度 | 查看审核成员登录、核对状态、签名状态、操作日志和确认书 PDF |
-| 材料导出 | 导出本班附件 2 等综测材料 |
-| 奖学金申报 | 查看院奖分配预览和候选名单，选择符合条件的学生，完成确认项和班长签名后提交 |
-| 荣誉称号申报 | 选择优秀学生或优秀学生干部，维护申报级别、推荐来源、任职情况和竞赛活动说明 |
-| 申报补充信息 | 导入性别、处分、任职、竞赛活动、申报意愿和申报级别等补充信息 |
+---
 
-### 审核成员端
+## 项目简介
 
-| 模块 | 功能 |
-| --- | --- |
-| 邀请登录 | 通过班长端生成的审核邀请链接进入综测评审核对页，登录后绑定当前访问设备 |
-| 分数核对 | 查看本班每名学生的综测分数和加分明细，标记已核对或记录问题说明 |
-| 本人签名 | 在线手写签名或上传签名图片，签名后同步到班长端审核小组页面 |
-| 状态同步 | 核对状态、签名状态和审核日志通过 WebSocket 同步到班长端 |
+HQU-CEAS(Comprehensive Evaluation & Awards System)是一套面向高校学院的**综合素质测评 + 奖学金/荣誉称号申报**一体化管理系统。它把原本依赖 Excel 表格人工汇总、线下签字、邮件往返的评测与申报流程,整合成一个带权限隔离、自动计算、在线签名、PDF 归档和实时协同的 Web 系统。
 
-## 综合素质测评流程
+系统围绕三类真实业务角色构建:学院管理员、班级负责人(班长)、以及综测审核小组成员。各角色看到的数据与可执行的操作彼此隔离,确保权限边界清晰、流程可追溯。
 
-### 1. 基础数据准备
+详细的业务流程与评审规则见 [docs/BUSINESS.md](docs/BUSINESS.md),系统架构细节见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
-管理员进入系统后，先维护学年、年级、班级和学生数据，再创建或导入班长账号。班长账号绑定到具体班级后，班长端只能处理本班学生、分数、综测审核和申报材料。
+## 核心特性
 
-### 2. 综测数据导入
+- **综合素质测评**:德育、学业、创新、体育、美育、劳动、公益服务等多维度分数录入与自动汇总,加分项逐条登记。
+- **成绩批量导入**:学业成绩、体测/体育课成绩、个人综测填写表等多来源 Excel 导入,带成功/失败明细日志。
+- **奖学金与荣誉申报**:申报批次创建、候选条件校验、名额金额控制、确认项核对、协议签署、PDF 归档与审核反馈的完整闭环。
+- **班级综测审核小组**:邀请链接 + 设备绑定登录,逐生勾核、在线签名,自动生成审核确认书 PDF。
+- **在线签名与 PDF 归档**:手写/上传签名,自动生成带签名的申报协议与审核确认书,统一文件存储与 SHA256 校验。
+- **模板化 Excel 导出**:基于官方附件模板(附件 2 / 附件 4 / 申报汇总表)填充数据导出,支持按年级打包。
+- **邮件通知**:可配置 SMTP,基于模板批量发送班长账号与申报通知,带发送日志。
+- **审计日志**:关键操作记录前后值快照,支持按模块、动作、学年班级检索。
+- **实时协同**:基于 WebSocket 推送数据变更,班长端与审核成员端即时同步。
 
-管理员在综测数据导入页面导入学业成绩、体测与体育课成绩。班长或管理员可以导入个人综测填写表，用于批量写入班级同学的可编辑分数组成。导入失败记录可在导出页面下载，内容包含所在行、学号、姓名和失败原因。
+## 系统角色
 
-### 3. 分数维护与自动计算
-
-综测分数组成分为人工维护项、导入项和系统计算项。管理员可以维护学业学术素质、体育基础分、社区表现分等管理员权限项目；班长和管理员可以维护德育、创新与实践、体育奖励、美育、劳动教育、公益服务、附加分等项目。
-
-系统会根据已有分数计算体育总分和综合测评总分。综合测评总分由学业学术素质、创新与实践能力、体育总分、美育、劳动教育、公益服务与社会工作、附加分相加得到。
-
-### 4. 加分明细核对
-
-可编辑分数支持登记加分明细。分数编辑页展示每名学生对应分数组成的明细入口，审核成员通过邀请链接进入核对页面时，也可以查看每项分数对应的加分明细。
-
-### 5. 班级内部综测审核
-
-班长进入审核小组确认页面，维护审核小组成员姓名和职务。系统默认创建班长、团支书、学习委员三类成员，实际名单可以保存为本班审核小组。成员保存后，班长可以为每位成员生成独立审核邀请链接。
-
-审核成员使用邀请链接登录后，逐名核对学生综测分数和加分明细，核对完成后标记状态并填写必要说明。班长端会显示每名学生在各审核成员中的核对进度；所有成员签名完成后，系统生成班级综合素质测评审核小组确认书 PDF，并把该班综测审核记录标记为完成。
-
-### 6. 综测材料导出
-
-管理员可以导出指定班级的附件 2、附件 4，也可以按年级导出全部班级附件压缩包。班长端可以导出本班附件 2。导出的附件会使用 `templates/` 中的模板文件填充学生分数、班级排名和学年信息。
-
-## 奖学金与荣誉称号申报流程
-
-### 1. 申报前置条件
-
-申报系统需要处于开放状态，班级内部综测审核需要完成并生成确认书 PDF。奖学金和荣誉称号提交时，后端会再次检查综测审核状态、候选条件、确认项、签名和名额金额限制。
-
-### 2. 管理员准备申报数据
-
-管理员在申报数据导入页面导入外部奖项名单、院奖名额金额、先进班级名单和班长邮箱。
-
-外部奖项名单支持国家奖学金、国家励志奖学金和校级奖学金。院奖名额金额表用于控制各班院级奖学金名额和可支配金额。先进班级名单会影响优秀学生干部的班级推荐名额。
-
-### 3. 班长补充学生申报信息
-
-班长在申报数据导入页面导入申报补充信息。补充信息包含性别、处分情况、任职情况、竞赛活动、是否申报优秀学生、优秀学生申报级别、是否申报优秀学生干部、优秀学生干部申报级别、备注等字段。
-
-平均绩点由系统按 `学业学术素质分 / 8 - 2.5` 计算，申报补充信息模板中无需填写平均绩点。
-
-### 4. 奖学金候选与院奖分配
-
-班长进入奖学金申报页面后，系统按班级综测数据生成候选名单。院级奖学金候选需要满足德育分不低于 90 分、体育基础分不低于 60 分、社区表现分不低于 98 分，并满足学习成绩排名要求。计算机类班级要求学习成绩排名位于班级前 25%，综测排名位于班级前 30%；非计算机类班级要求学习成绩排名位于班级前 60%。
-
-院级奖学金与国家奖学金、国家励志奖学金、校级奖学金互斥。已经通过外部奖项导入获得上述奖项标签的学生，会在院级奖学金候选检查中显示互斥原因。
-
-系统按综测总分排序生成院奖分配预览。一、二、三等奖金额分别为 1000、800、600。提交前会检查总人数是否超过班级名额、总金额是否超过可支配金额，以及一等奖人数小于等于二等奖人数、二等奖人数小于等于三等奖人数。
-
-### 5. 奖学金班级提交
-
-班长选择符合条件的学生后，需要完成奖学金确认项。确认项包括当学年无违法违规违纪行为、无不及格课程、无学术不端行为、诚实守信且道德品质优良、积极参加社会实践志愿服务和公益活动、关心集体并维护集体荣誉。
-
-确认项全部完成后，班长在线签署奖学金班长确认协议。系统提交申报批次时会生成并归档确认协议 PDF，申报批次状态变为待审核。
-
-### 6. 荣誉称号候选与材料
-
-荣誉称号分为优秀学生和优秀学生干部。
-
-优秀学生候选需要满足德育分不低于 90 分、社区表现分不低于 98 分、获得指定奖学金标签、综测排名达标、体育基础分不低于 80 分。计算机类班级综测排名要求位于班级前 30%，非计算机类班级要求位于班级前 10%。
-
-优秀学生干部候选需要满足德育分不低于 90 分、社区表现分不低于 98 分、综测排名达标。计算机类班级综测排名要求位于班级前 50%，非计算机类班级要求位于班级前 30%，且非计算机类班级还要求学习成绩排名位于班级前 30%。优秀学生干部材料包括学生本人申报意愿、干部任职说明、任期满一年说明、考核良好及以上说明、活动组织或表彰说明。
-
-优秀学生干部区分班级推荐和学生会推荐。普通班级的班级推荐名额为 1 人，拥有先进班级或先进团支部记录的班级推荐名额为 2 人，学生会推荐不占用班级推荐名额。
-
-### 7. 荣誉称号班级提交
-
-班长在荣誉称号申报页面选择优秀学生或优秀学生干部，选择学生后维护申报级别、推荐来源、任职情况、竞赛活动和备注。提交前需要完成荣誉称号确认项，包括当学年无违法违规违纪行为、无学术不端行为、诚实守信且道德品质优良、积极参加社会实践志愿服务和公益活动、关心集体并维护集体荣誉、学生本人具有申报意愿、干部任职信息真实有效、组织活动或受表彰情况真实有效。
-
-确认项全部完成后，班长在线签署荣誉称号班长确认协议。系统提交申报批次时会生成并归档确认协议 PDF，申报批次状态变为待审核。
-
-### 8. 管理员审核与材料导出
-
-管理员在申报审核页面查看奖学金和荣誉称号申报批次，核对申报学生、确认项、补充材料和班长确认协议 PDF。审核时可以填写审核意见，并执行退回修改或确认通过。荣誉称号审核通过时，管理员可以确认最终获奖级别。
-
-审核通过后，系统为申报学生写入申报通过标签。管理员可以在申报材料导出页面导出申报汇总、院奖分配、荣誉称号明细、附件 2 申报汇总表和邮件发送记录。
+| 角色 | 标识 | 主要职责 |
+| --- | --- | --- |
+| 学院管理员 | `admin` | 全局管理:年级班级、学年、学生、综测数据、申报审核、配额、模板、邮件、审计等 |
+| 班级负责人 | `monitor` | 本班分数维护、综测审核小组管理、奖学金/荣誉称号申报提交、材料与签名 |
+| 审核成员 | `reviewer` | 通过邀请链接进入,对本班综测分数逐生核对并签名 |
 
 ## 技术栈
 
 | 层级 | 技术 |
 | --- | --- |
-| 前端 | React 19, TypeScript, Vite 7, Tailwind CSS 4, Lucide React |
-| 后端 | Node.js, Express 5, TypeScript, Prisma, SQLite |
+| 前端 | React 19, TypeScript, Vite 7, Tailwind CSS 4 |
+| 后端 | Node.js, Express 4, TypeScript, Prisma 6, SQLite |
 | 文件处理 | ExcelJS, Multer, Archiver |
 | 认证与安全 | JSON Web Token, bcryptjs, CORS |
-| 实时通信 | WebSocket |
-| 项目管理 | npm workspaces, concurrently |
+| 实时通信 | WebSocket (ws) |
+| 工程化 | npm workspaces 单仓库, concurrently, tsx |
+
+## 系统架构
+
+前后端分离的单仓库(monorepo)架构:前端通过 REST API 与 WebSocket 同后端通信,后端经 Prisma 访问 SQLite,签名与 PDF 文件统一落地到存储层并以 SHA256 校验。
+
+```mermaid
+graph TD
+    A[React 19 前端 Vite + Tailwind] -->|REST API /api| B[Express 后端]
+    A -->|WebSocket /ws| B
+    B -->|Prisma ORM| C[(SQLite dev.db)]
+    B -->|签名 / PDF + SHA256| D[storage/ 文件存储]
+    B -->|ExcelJS + 官方模板| E[templates/ Excel 导出]
+    B -->|SMTP| F[邮件服务]
+```
 
 ## 目录结构
 
 ```text
-HQU-CCES/
-|-- packages/
-|   |-- backend/
-|   |   |-- prisma/              # Prisma schema、迁移和种子数据
-|   |   |-- src/                 # 后端源码
-|   |   |-- storage/             # 签名和 PDF 等运行期文件
-|   |   `-- uploads/             # 导入上传文件
-|   `-- frontend/
-|       |-- src/                 # 前端源码
-|       `-- public/              # 静态资源
-|-- templates/                   # Excel 导入模板
-|-- docs/                        # 项目文档与实施计划
-|-- package.json                 # 根工作区脚本
-`-- README.md
+HQU-CEAS/
+├── packages/
+│   ├── backend/                 # Express + Prisma 后端
+│   │   ├── prisma/
+│   │   │   ├── schema.prisma    # 数据模型(29 个模型)
+│   │   │   ├── seed.ts          # 种子数据(默认管理员)
+│   │   │   ├── dev.db           # SQLite 数据库(私有仓库,随仓库保存)
+│   │   │   └── archive/         # 历史数据库归档
+│   │   ├── src/
+│   │   │   ├── config/          # 环境配置与业务规则常量
+│   │   │   ├── middleware/      # JWT 认证、错误处理
+│   │   │   ├── routes/          # REST 路由(29 组)
+│   │   │   ├── services/        # 业务逻辑与测试
+│   │   │   ├── utils/           # 计算、密码、令牌工具
+│   │   │   ├── ws/              # WebSocket 服务
+│   │   │   └── index.ts         # 应用入口
+│   │   ├── storage/             # 运行期文件(签名、PDF,按年/月归档)
+│   │   └── templates/           # 官方附件 Excel 导出模板
+│   └── frontend/                # React + Vite 前端
+│       ├── public/              # 静态资源(logo、字体、操作指南 PDF)
+│       ├── src/
+│       │   ├── components/      # 业务组件(按模块分目录)
+│       │   ├── hooks/           # useAuth / usePageMeta / useScores
+│       │   ├── lib/             # API 客户端、路由、鉴权、WebSocket
+│       │   ├── routes/          # 页面级路由组件
+│       │   ├── styles/          # 全局样式
+│       │   ├── App.tsx          # 路由表
+│       │   └── main.tsx         # 入口
+│       └── index.html           # 单页应用入口
+├── docs/
+│   ├── ARCHITECTURE.md          # 架构说明
+│   ├── BUSINESS.md              # 业务流程与评审规则
+│   ├── reference/               # 学校官方文件(通知、办法、原始附件)
+│   └── samples/                 # 导入/填写样例表格
+├── scripts/
+│   └── generate_guides.py       # 操作指南 PDF 生成脚本(XeLaTeX)
+├── start.bat                    # Windows 一键启动(前后端 + Cloudflare Tunnel)
+├── package.json                 # npm workspaces 根配置
+└── README.md
 ```
 
-## 环境要求
+## 快速开始
 
-| 工具 | 版本 |
-| --- | --- |
-| Node.js | 18 或更高版本 |
-| npm | 9 或更高版本 |
+### 环境要求
 
-## 本地运行
+- Node.js 18 及以上
+- npm 9 及以上
 
-安装依赖：
+### 安装与启动
 
 ```bash
+git clone <repository-url>
+cd HQU-CEAS
 npm install
-```
 
-创建后端环境变量文件。PowerShell 使用：
-
-```powershell
-Copy-Item packages/backend/.env.example packages/backend/.env
-```
-
-Bash 使用：
-
-```bash
+# 创建后端环境变量文件
 cp packages/backend/.env.example packages/backend/.env
-```
 
-初始化数据库并写入种子数据：
+# 生成 Prisma Client
+npm run db:generate
 
-```bash
-npm run db:push
-npm run db:seed
-```
-
-启动前后端开发服务：
-
-```bash
+# 启动前后端开发服务
 npm run dev
 ```
 
-默认访问地址：
+前端默认运行在 http://localhost:3000,后端默认监听 http://localhost:4000(健康检查 `/api/health`)。
 
-| 服务 | 地址 |
-| --- | --- |
-| 前端 | http://localhost:3000 |
-| 后端 | http://localhost:4000 |
-| 健康检查 | http://localhost:4000/api/health |
+> **说明**:本仓库为私有仓库,`packages/backend/prisma/dev.db` 随仓库携带真实业务数据,克隆后即可直接使用。
+> 如需从零初始化一个空数据库,删除 `dev.db` 后执行 `npm run db:push && npm run db:seed`。
 
-默认管理员账号：
+### 默认管理员账号(仅空库种子数据)
 
 | 用户名 | 密码 |
 | --- | --- |
 | `admin` | `admin123` |
 
+> 生产部署务必立即修改默认密码,并设置强随机的 `JWT_SECRET`。
+
+## 一键启动(Windows)
+
+双击或在终端运行根目录的 `start.bat`,脚本会:
+
+1. 清理 3000 / 4000 端口上的旧进程;
+2. 启动后端(`npm run dev:backend`)与前端(`npm run dev:frontend`);
+3. 若安装了 `cloudflared`,启动 Cloudflare Tunnel 并把系统暴露到公网域名(日志写入 `.logs/cloudflared.log`);
+4. 按任意键停止全部服务。
+
 ## 环境变量
 
-`packages/backend/.env.example` 提供后端环境变量模板。
+后端环境变量模板见 `packages/backend/.env.example`:
 
-| 变量 | 默认示例 | 用途 |
+| 变量 | 说明 | 示例 |
 | --- | --- | --- |
-| `DATABASE_URL` | `file:./dev.db` | Prisma 数据库连接地址 |
-| `JWT_SECRET` | `replace-with-a-long-random-secret` | JWT 签名密钥 |
-| `PORT` | `4000` | 后端 HTTP 服务端口 |
-| `CORS_ORIGIN` | `http://localhost:3000` | 允许访问后端的前端来源 |
-| `UPLOAD_DIR` | `./uploads` | 导入文件上传目录 |
+| `DATABASE_URL` | Prisma 数据库连接串(相对 `schema.prisma` 所在目录) | `file:./dev.db` |
+| `JWT_SECRET` | JWT 签名密钥(生产务必替换为强随机值) | `replace-with-a-long-random-secret` |
+| `PORT` | 后端监听端口 | `4000` |
+| `CORS_ORIGIN` | 允许跨域的前端来源 | `http://localhost:3000` |
+| `UPLOAD_DIR` | 导入文件上传目录(可选) | `./uploads` |
 
 ## 常用脚本
 
-根目录脚本：
+根目录(npm workspaces):
 
-| 命令 | 作用 |
+| 命令 | 说明 |
 | --- | --- |
-| `npm run dev` | 同时启动后端和前端开发服务 |
-| `npm run dev:backend` | 启动后端开发服务 |
-| `npm run dev:frontend` | 启动前端开发服务 |
-| `npm run build` | 构建前端和后端 |
-| `npm test` | 运行后端测试 |
+| `npm run dev` | 同时启动前后端开发服务 |
+| `npm run dev:backend` / `npm run dev:frontend` | 单独启动后端 / 前端 |
+| `npm run build` | 构建后端(tsc)与前端(vite build) |
+| `npm test` | 运行后端测试(node:test) |
 | `npm run db:generate` | 生成 Prisma Client |
-| `npm run db:migrate` | 执行 Prisma 迁移 |
-| `npm run db:push` | 将 Prisma schema 写入数据库 |
+| `npm run db:push` | 将 schema 同步到数据库 |
 | `npm run db:seed` | 写入种子数据 |
+| `npm run db:migrate` | 开发环境创建并应用迁移 |
 | `npm run db:studio` | 打开 Prisma Studio |
 
-后端脚本：
+工具脚本:
 
-| 命令 | 作用 |
+| 命令 | 说明 |
 | --- | --- |
-| `npm run dev -w packages/backend` | 使用 `tsx watch` 启动后端 |
-| `npm run build -w packages/backend` | 编译后端 TypeScript |
-| `npm test -w packages/backend` | 运行后端测试 |
-| `npm run start -w packages/backend` | 运行已编译的后端产物 |
+| `python scripts/generate_guides.py` | 重新生成 `packages/frontend/public/guides/` 下的四份操作指南 PDF(需要 XeLaTeX) |
 
-前端脚本：
+## 前端页面路由
 
-| 命令 | 作用 |
-| --- | --- |
-| `npm run dev -w packages/frontend` | 启动 Vite 开发服务 |
-| `npm run build -w packages/frontend` | 构建前端静态资源 |
-| `npm run preview -w packages/frontend` | 预览前端构建产物 |
+单页应用,路由表定义于 `packages/frontend/src/App.tsx`:
 
-## 页面入口
-
-| 页面地址 | 页面 |
-| --- | --- |
-| `/login` | 管理员和班长登录 |
-| `/review-login` | 综测审核成员登录 |
-| `/review/scores` | 审核成员分数核对页 |
-| `/entry` | 系统入口 |
-| `/dashboard` | 综测总览 |
-| `/scores` | 综测分数管理 |
-| `/monitor/score-review` | 班级内部综测审核管理 |
-| `/students` | 学生管理 |
-| `/import` | 综测数据导入 |
-| `/export` | 综测材料导出 |
-| `/awards` | 奖学金申报 |
-| `/honors` | 荣誉称号申报 |
-| `/declaration-reviews` | 申报审核 |
-| `/tags` | 标签视图 |
-| `/mail` | 邮箱配置 |
-| `/mail/templates` | 邮件模板 |
-| `/audit-logs` | 操作日志 |
-| `/settings` | 系统设置 |
-
-## 后端接口分组
-
-| 前缀 | 模块 |
-| --- | --- |
-| `/api/auth` | 登录认证 |
-| `/api/users` | 用户管理 |
-| `/api/grades` | 年级与班级 |
-| `/api/students` | 学生管理 |
-| `/api/scores` | 综测分数 |
-| `/api/import` | 数据导入 |
-| `/api/export` | 材料导出 |
-| `/api/academic-years` | 学年管理 |
-| `/api/system` | 系统设置 |
-| `/api/templates` | 模板下载 |
-| `/api/external-awards` | 外部奖项 |
-| `/api/award-quotas` | 奖学金名额 |
-| `/api/class-honors` | 先进班级 |
-| `/api/awards` | 奖学金申报 |
-| `/api/award-declarations` | 奖学金申报单 |
-| `/api/honors` | 荣誉称号 |
-| `/api/honor-declarations` | 荣誉称号申报单 |
-| `/api/declaration-supplements` | 申报补充材料 |
-| `/api/declaration-reviews` | 申报审核 |
-| `/api/score-review-groups` | 综测审核小组 |
-| `/api/score-review-invites` | 综测审核邀请与核对状态 |
-| `/api/signatures` | 签名文件 |
-| `/api/pdf-materials` | PDF 材料 |
-| `/api/tags` | 标签 |
-| `/api/audit-logs` | 操作日志 |
-| `/api/mail` | 邮件发送 |
-| `/api/mail/settings` | 邮箱设置 |
-| `/api/mail/templates` | 邮件模板 |
-| `/api/mail/logs` | 邮件日志 |
-| `/ws` | WebSocket 连接 |
-
-## 综测分数组成
-
-| 分数组成 | 维护方式 | 说明 |
+| 路径 | 页面 | 主要使用角色 |
 | --- | --- | --- |
-| 德育测评 | 管理员和班长编辑 | 满分 100 |
-| 学业学术素质 | 管理员维护 | 满分 60 |
-| 创新与实践能力 | 管理员和班长编辑 | 满分 13 |
-| 体测成绩 | 系统导入或计算 | 满分 100 |
-| 体育课成绩 | 系统导入或计算 | 满分 100 |
-| 体育基础分 | 管理员维护 | 支持小数 |
-| 体育奖励分 | 管理员和班长编辑 | 满分 3 |
-| 体育总分 | 系统计算 | 满分 7 |
-| 美育 | 管理员和班长编辑 | 满分 6 |
-| 劳动教育 | 管理员和班长编辑 | 满分 4 |
-| 公益服务与社会工作 | 管理员和班长编辑 | 满分 10 |
-| 社区表现分 | 管理员维护 | 满分 100 |
-| 附加分 | 管理员和班长编辑 | 满分 5 |
-| 总分 | 系统计算 | 由学业、创新、体育总分、美育、劳动、公益服务和附加分相加 |
+| `/login` | 管理员 / 班长登录 | admin, monitor |
+| `/review-login` | 审核成员邀请登录 | reviewer |
+| `/review/scores` | 审核成员分数核对 | reviewer |
+| `/entry` | 系统入口(双系统状态) | admin, monitor |
+| `/dashboard` · `/monitor/dashboard` | 综测总览 / 班级看板 | admin / monitor |
+| `/scores` · `/monitor/scores` | 综测分数管理 / 本班分数 | admin / monitor |
+| `/monitor/score-review` | 班级综测审核小组管理 | monitor |
+| `/students` | 学生管理 | admin |
+| `/import` · `/export` | 综测数据导入 / 材料导出 | admin, monitor |
+| `/accounts` | 账号管理 | admin |
+| `/awards` · `/monitor/awards` | 奖学金申报 | admin / monitor |
+| `/honors` · `/monitor/honors` | 荣誉称号申报 | admin / monitor |
+| `/declaration-reviews` | 申报审核 | admin |
+| `/declaration-import` · `/declaration-export` | 申报数据导入 / 导出 | admin |
+| `/monitor/submissions` | 班级申报记录 | monitor |
+| `/tags` | 标签视图 | admin |
+| `/audit-logs` | 操作日志 | admin |
+| `/accounts-mail` | 邮箱配置与发送 | admin |
+| `/mail-templates` | 邮件模板 | admin |
+| `/settings` | 系统设置 | admin |
+
+## API 接口分组
+
+REST 路由统一挂载在 `/api` 前缀下(见 `packages/backend/src/index.ts`):
+
+| 路由前缀 | 模块 | 路由前缀 | 模块 |
+| --- | --- | --- | --- |
+| `/api/auth` | 登录认证 | `/api/honor-declarations` | 荣誉称号申报单 |
+| `/api/users` | 用户管理 | `/api/declaration-supplements` | 申报补充信息 |
+| `/api/grades` | 年级与班级 | `/api/declaration-reviews` | 申报审核 |
+| `/api/students` | 学生管理 | `/api/score-review-groups` | 综测审核小组 |
+| `/api/scores` | 综测分数 | `/api/score-review-invites` | 审核邀请与核对 |
+| `/api/import` | 数据导入 | `/api/signatures` | 签名文件 |
+| `/api/export` | 材料导出 | `/api/pdf-materials` | PDF 材料 |
+| `/api/academic-years` | 学年管理 | `/api/tags` | 标签 |
+| `/api/system` | 系统设置 | `/api/audit-logs` | 操作日志 |
+| `/api/templates` | 模板下载 | `/api/mail` | 邮件发送 |
+| `/api/external-awards` | 外部奖项 | `/api/mail/settings` | 邮箱设置 |
+| `/api/award-quotas` | 奖学金名额 | `/api/mail/templates` | 邮件模板 |
+| `/api/class-honors` | 先进班级 | `/api/mail/logs` | 邮件日志 |
+| `/api/awards` | 奖学金申报 | `/api/health` | 健康检查 |
+| `/api/award-declarations` | 奖学金申报单 | `/ws` | WebSocket |
 
 ## 数据与文件
 
-开发环境默认使用 SQLite，数据库地址由 `DATABASE_URL` 控制。执行 `npm run db:push` 后，Prisma 会按照 `packages/backend/prisma/schema.prisma` 创建或更新数据库结构。
+- **数据库**:SQLite,位于 `packages/backend/prisma/dev.db`,由 `DATABASE_URL` 控制;29 个 Prisma 模型覆盖组织人员、成绩导入、申报、审核、文件签名、标签审计、邮件设置等业务域(明细见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md))。
+- **导出模板**:官方附件模板位于 `packages/backend/templates/`,导出附件 2 / 附件 4 / 申报汇总表时按模板填充。
+- **运行期文件**:签名图片与生成的 PDF 存放在 `packages/backend/storage/`,按 `类型/年/月` 归档,数据库中以 SHA256 索引。
+- **操作指南**:`packages/frontend/public/guides/` 下的四份 PDF 由 `scripts/generate_guides.py` 生成,前端页面内可直接打开。
 
-导入模板位于 `templates/`。签名、PDF 材料和运行期文件默认存放在 `packages/backend/storage/` 和 `packages/backend/uploads/` 下。
-
-## 构建与测试
-
-构建前后端：
-
-```bash
-npm run build
-```
-
-运行测试：
+## 构建与部署
 
 ```bash
-npm test
+npm run build                      # 后端 tsc 编译到 dist/,前端 vite 构建到 dist/
+npm run start -w packages/backend  # 运行后端编译产物
 ```
 
-单独运行后端测试：
+部署要点:
 
-```bash
-npm test -w packages/backend
-```
+- 设置强随机 `JWT_SECRET`,修改默认管理员密码;
+- `CORS_ORIGIN` 配置为前端实际域名;
+- 前端构建产物位于 `packages/frontend/dist/`,可由任意静态服务器或反向代理托管;
+- 保证数据库文件与 `storage/` 目录可写;
+- 日常演示 / 校内使用也可直接用 `start.bat` 以开发模式 + Cloudflare Tunnel 运行。
 
-## 生产运行
+## 项目文档
 
-构建项目：
-
-```bash
-npm run build
-```
-
-启动后端编译产物：
-
-```bash
-npm run start -w packages/backend
-```
-
-前端构建产物位于 `packages/frontend/dist/`，可由静态资源服务器托管。后端需要配置 `DATABASE_URL`、`JWT_SECRET`、`PORT`、`CORS_ORIGIN` 等环境变量，并保证数据库文件、上传目录和材料归档目录具有写入权限。
+| 文档 | 内容 |
+| --- | --- |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 架构说明:分层设计、模块清单、数据模型、文件存储、脚本与部署 |
+| [docs/BUSINESS.md](docs/BUSINESS.md) | 业务流程与规则:综测流程、申报流程、分数组成、候选条件 |
+| `docs/reference/` | 学校官方文件:评审通知、奖学金实施办法、荣誉称号授予办法、原始附件表 |
+| `docs/samples/` | 样例表格:个人综测填写表、学生导入模板导出样例 |
 
 ## 许可证
 
-当前仓库未包含 `LICENSE` 文件。
+本项目为华侨大学计算机科学与技术学院内部业务系统,存放于私有仓库,未附开源许可证。如需开源发布,请先补充 LICENSE 文件并确认数据与隐私合规。

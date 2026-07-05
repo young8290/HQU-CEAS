@@ -1,8 +1,8 @@
 {
-  "name": "comprehensive-eval-monorepo",
+  "name": "hqu-ceas",
   "version": "1.0.0",
   "private": true,
-  "description": "综合素质测评管理系统",
+  "description": "华侨大学计算机学院综合素质测评与评奖申报系统 (HQU Comprehensive Evaluation & Awards System)",
   "workspaces": [
     "packages/backend",
     "packages/frontend"

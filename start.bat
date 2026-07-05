@@ -3,12 +3,13 @@ setlocal EnableExtensions
 chcp 65001 >nul
 
 set "ROOT_DIR=%~dp0"
-set "TUNNEL_LOG=%ROOT_DIR%cloudflared.log"
+set "TUNNEL_LOG=%ROOT_DIR%.logs\cloudflared.log"
+if not exist "%ROOT_DIR%.logs" mkdir "%ROOT_DIR%.logs"
 
-title HQU-CCES Launcher
+title HQU-CEAS Launcher
 
 echo ========================================
-echo   HQU-CCES starting...
+echo   HQU-CEAS starting...
 echo ========================================
 
 echo.

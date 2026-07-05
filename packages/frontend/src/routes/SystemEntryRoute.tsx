@@ -9,7 +9,7 @@ import {
   type GuideItem,
 } from '../components/common/OperationGuide';
 import { api } from '../lib/api';
-import { getUser } from '../lib/auth';
+import { getUser, roleLabel } from '../lib/auth';
 import { AppLink } from '../lib/router';
 import { usePageMeta } from '../hooks/usePageMeta';
 
@@ -38,14 +38,14 @@ export default function SystemEntryRoute() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <ScreenState label="系统入口加载中..." fullScreen />;
+  if (loading) return <ScreenState label="系统入口加载中" fullScreen />;
 
   return (
     <main className="min-h-screen bg-[#faf7f0] px-5 py-8 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <header className="mb-7 border-b border-[#e8dfd2] pb-6 dark:border-neutral-800">
           <div className="mb-5 flex items-center gap-3">
-            <img src="/学院logo.png" alt="学院logo" width="40" height="40" decoding="async" className="h-10 w-10 rounded-md border border-[#e2d7c8] bg-white object-contain p-1 dark:border-neutral-800 dark:bg-neutral-900" />
+            <img src="/college-logo.png" alt="学院logo" width="40" height="40" decoding="async" className="h-10 w-10 rounded-md border border-[#e2d7c8] bg-white object-contain p-1 dark:border-neutral-800 dark:bg-neutral-900" />
             <div>
               <p className="text-xs font-medium text-[#9a5b3d] dark:text-primary-300">计算机科学与技术学院</p>
               <p className="text-sm text-neutral-500 dark:text-neutral-400">当前学年：{year}</p>
@@ -55,11 +55,11 @@ export default function SystemEntryRoute() {
           <div>
               <h1 className="text-3xl font-semibold tracking-normal text-neutral-950 dark:text-white">系统入口</h1>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-neutral-600 dark:text-neutral-300">
-                两个入口进入不同业务区。综合素质测评入口只展示综测、学生、导入导出和评审签名；奖学金与荣誉称号申报入口只展示申报、审核、邮件、标签和日志。
+                按业务进入对应页面。综测区管理学生、分数、附件和评审；申报区管理候选、审核、邮件和日志。
             </p>
           </div>
             <div className="rounded-md border border-[#e2d7c8] bg-[#fffdf8] px-3 py-2 text-sm text-[#7c4a34] shadow-[0_1px_0_rgba(40,32,24,0.04)] dark:border-neutral-700 dark:bg-neutral-900 dark:text-primary-300">
-              {user?.displayName || user?.username}，{user?.role === 'admin' ? '管理员端' : '班长端'}
+              {user?.displayName || user?.username}，{roleLabel(user?.role, true)}
             </div>
           </div>
         </header>
@@ -70,7 +70,7 @@ export default function SystemEntryRoute() {
           <EntryCard
             title="综合素质测评填写系统"
             eyebrow="测评数据区"
-            description="维护学生基础信息、综测分数、导入导出附件和综测审核小组签名。该入口保留综测评审相关页面，申报页面从另一个入口进入。"
+            description="学生、分数、附件和综测评审。"
             open={status?.comprehensiveEvalOpen ?? false}
             href={user?.role === 'admin' ? '/dashboard' : '/monitor/dashboard'}
             actionLabel={user?.role === 'admin' ? '进入综测总览' : '进入本班综测'}
@@ -83,7 +83,7 @@ export default function SystemEntryRoute() {
           <EntryCard
             title="奖学金与荣誉称号申报系统"
             eyebrow="班级申报区"
-            description="查看候选名单、完成确认项、签署班长确认协议、提交班级申报，并由管理员审核与归档。该入口只展示申报相关功能。"
+            description="候选名单、确认协议、申报审核和材料管理。"
             open={status?.declarationOpen ?? false}
             href={user?.role === 'admin' ? '/declaration-reviews' : '/monitor/awards'}
             actionLabel={user?.role === 'admin' ? '进入申报审核' : '进入奖学金申报'}
@@ -171,7 +171,7 @@ function EntryCard({
             onClick={() => onGuideOpen(guide)}
             className="rounded-md border border-[#d8c9b8] bg-white px-4 py-2 text-sm font-medium text-[#7c4a34] transition-colors hover:bg-[#f6f1e8] dark:border-neutral-800 dark:bg-neutral-950 dark:text-primary-300"
           >
-            查看操作指南
+            操作指南
           </button>
         )}
         {open ? (
@@ -180,7 +180,7 @@ function EntryCard({
           </AppLink>
         ) : (
           <button type="button" disabled className="rounded-md border border-neutral-200 px-4 py-2 text-sm text-neutral-400 dark:border-neutral-800">
-            暂停进入
+            暂停开放
           </button>
         )}
       </div>

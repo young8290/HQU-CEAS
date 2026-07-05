@@ -12,7 +12,7 @@ export default function NotFoundRoute() {
           页面未找到
         </h1>
         <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-          您访问的页面不存在，或链接已经失效。
+          页面不存在或链接已失效。
         </p>
         <AppLink
           to="/login"

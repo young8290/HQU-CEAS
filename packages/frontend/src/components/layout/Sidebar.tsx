@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from 'react';
-import { getUser, clearAuth, type User } from '../../lib/auth';
+import { getUser, clearAuth, roleLabel, type User } from '../../lib/auth';
 import { AppLink, navigateTo, useCurrentPath } from '../../lib/router';
 import type { SystemScope } from './AppShell';
 
@@ -133,14 +133,14 @@ export default function Sidebar({ scope }: { scope: SystemScope }) {
         <div className="flex h-16 items-center justify-between border-b border-[#ded6c8] px-4 dark:border-neutral-800">
           {!collapsed ? (
             <div className="flex items-center gap-2">
-              <img src="/学院logo.png" alt="学院logo" width="32" height="32" decoding="async" className="h-8 w-8 rounded-md object-contain" />
+              <img src="/college-logo.png" alt="学院logo" width="32" height="32" decoding="async" className="h-8 w-8 rounded-md object-contain" />
               <div>
                 <span className="block text-sm font-semibold text-neutral-950 dark:text-white">{systemName[scope]}</span>
-                <span className="block text-[11px] text-neutral-500 dark:text-neutral-400">{user?.role === 'admin' ? '管理员端' : '班长端'}</span>
+                <span className="block text-[11px] text-neutral-500 dark:text-neutral-400">{roleLabel(user?.role, true)}</span>
               </div>
             </div>
           ) : (
-            <img src="/学院logo.png" alt="学院logo" width="32" height="32" decoding="async" className="h-8 w-8 rounded-md object-contain" />
+            <img src="/college-logo.png" alt="学院logo" width="32" height="32" decoding="async" className="h-8 w-8 rounded-md object-contain" />
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -181,7 +181,7 @@ export default function Sidebar({ scope }: { scope: SystemScope }) {
                 {user.displayName || user.username}
               </p>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                {user.role === 'admin' ? '管理员' : user.className || '班长'}
+                {user.role === 'monitor' ? user.className || roleLabel(user.role) : roleLabel(user.role)}
               </p>
             </div>
           )}
@@ -194,7 +194,7 @@ export default function Sidebar({ scope }: { scope: SystemScope }) {
           </button>
           {!collapsed && (
             <div className="mt-3 flex flex-col items-center gap-1">
-              <img src="/学术部logo.png" alt="学术部logo" width="40" height="40" decoding="async" className="w-10 h-10 object-contain opacity-60" />
+              <img src="/academic-dept-logo.png" alt="学术部logo" width="40" height="40" decoding="async" className="w-10 h-10 object-contain opacity-60" />
               <p className="text-[10px] text-neutral-400 dark:text-neutral-600 text-center leading-tight">
                 计算机科学与技术学院<br />学术部制作
               </p>

@@ -62,7 +62,7 @@ export default function DeclarationReviewsPage() {
       {message && <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">{message}</div>}
       <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
         <DataPanel title="审核列表">
-          {loading ? <ScreenState label="审核列表加载中..." /> : (
+          {loading ? <ScreenState label="审核列表加载中" /> : (
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
                 <thead className="bg-neutral-50 text-xs text-neutral-500 dark:bg-neutral-950">
@@ -91,7 +91,7 @@ export default function DeclarationReviewsPage() {
             </div>
           )}
         </DataPanel>
-        <DataPanel title="审核详情" description="审核意见会写入申报批次记录。">
+        <DataPanel title="审核详情" description="审核意见将写入申报记录。">
           {selected ? (
             <div className="space-y-4">
               <div>
@@ -135,7 +135,7 @@ export default function DeclarationReviewsPage() {
               </div>
             </div>
           ) : (
-            <ScreenState label="请选择一条申报记录" />
+            <ScreenState label="选择一条申报记录" />
           )}
         </DataPanel>
       </div>
@@ -158,7 +158,7 @@ function AgreementPdf({ declaration }: { declaration: any }) {
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="font-medium text-neutral-900 dark:text-white">班长确认协议 PDF</p>
-          <p className="text-xs text-neutral-500">审核前请核对协议签名与申报批次。</p>
+          <p className="text-xs text-neutral-500">核对协议签名和申报批次。</p>
         </div>
         <button
           type="button"

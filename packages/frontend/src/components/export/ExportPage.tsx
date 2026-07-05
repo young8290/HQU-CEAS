@@ -124,7 +124,7 @@ export default function ExportPage({ scope = 'evaluation' }: { scope?: ExportSco
       }
 
       await api.download(endpoint, filename);
-      setSuccessMsg(`导出成功: ${filename}`);
+      setSuccessMsg(`已导出：${filename}`);
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err: any) {
       setError(err.message || '导出失败');
@@ -141,8 +141,8 @@ export default function ExportPage({ scope = 'evaluation' }: { scope?: ExportSco
         </h1>
         <p className="text-neutral-500 dark:text-neutral-400 mt-1">
           {scope === 'evaluation'
-            ? '导出综测附件、成绩汇总和导入失败记录。'
-            : '导出申报汇总、院奖分配、荣誉称号申报表、账号和邮件记录。'}
+            ? '综测附件、成绩汇总和失败记录。'
+            : '申报汇总、院奖分配、荣誉明细、账号和邮件记录。'}
         </p>
       </div>
 
@@ -169,7 +169,7 @@ export default function ExportPage({ scope = 'evaluation' }: { scope?: ExportSco
               disabled={!isAdmin}
               className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
             >
-              <option value="">请选择年级</option>
+              <option value="">选择年级</option>
               {grades.map((g) => (
                 <option key={g.id} value={g.id}>{g.name}</option>
               ))}
@@ -183,7 +183,7 @@ export default function ExportPage({ scope = 'evaluation' }: { scope?: ExportSco
               disabled={!isAdmin && !!user?.classId}
               className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
             >
-              <option value="">请选择班级</option>
+              <option value="">选择班级</option>
               {classes.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -198,7 +198,7 @@ export default function ExportPage({ scope = 'evaluation' }: { scope?: ExportSco
           <>
             <ExportCard
               title="导出附件2"
-              description="复制附件2模板并填入数据，B6开始填写学号，无测评学年列"
+              description="按附件 2 模板生成综测汇总表"
               disabled={!selectedClass || exporting}
               onClick={() => handleExport('attachment2')}
               icon="附件2"
@@ -206,7 +206,7 @@ export default function ExportPage({ scope = 'evaluation' }: { scope?: ExportSco
             {isAdmin && (
               <ExportCard
                 title="导出附件4"
-                description="复制附件4模板并填入数据，A2开始填写，文本和数字按模板格式，无总分列"
+                description="按附件 4 模板生成上报表"
                 disabled={!selectedClass || exporting}
                 onClick={() => handleExport('attachment4')}
                 icon="附件4"
@@ -215,7 +215,7 @@ export default function ExportPage({ scope = 'evaluation' }: { scope?: ExportSco
             {isAdmin && (
               <ExportCard
                 title="导出全部附件 ZIP"
-                description="导出选定年级下全部班级的附件2和附件4，打包为ZIP"
+                description="选定年级的附件 2 和附件 4"
                 disabled={!selectedGrade || exporting}
                 onClick={() => handleExport('all')}
                 icon="ZIP"
@@ -224,7 +224,7 @@ export default function ExportPage({ scope = 'evaluation' }: { scope?: ExportSco
             {isAdmin && (
               <ExportCard
                 title="导出导入失败记录"
-                description="导出最近导入过程中未匹配到学生的记录"
+                description="最近导入失败明细"
                 disabled={exporting}
                 onClick={() => handleExport('failed')}
                 icon="失败"
@@ -236,42 +236,42 @@ export default function ExportPage({ scope = 'evaluation' }: { scope?: ExportSco
           <>
             <ExportCard
               title="导出申报汇总"
-              description="导出奖学金和荣誉称号申报批次、状态和学生数量"
+              description="申报批次、状态和学生数量"
               disabled={exporting}
               onClick={() => handleExport('declarations')}
               icon="申报"
             />
             <ExportCard
               title="导出院奖分配"
-              description="导出院级奖学金班级名额和金额控制表"
+              description="班级名额和金额控制表"
               disabled={exporting}
               onClick={() => handleExport('awardAllocation')}
               icon="院奖"
             />
             <ExportCard
               title="导出附件2申报汇总表"
-              description="按附件2模板导出院级奖学金、优秀学生干部、优秀学生汇总表"
+              description="院奖、优秀学生干部、优秀学生汇总"
               disabled={exporting}
               onClick={() => handleExport('declarationAttachment2')}
               icon="附件2"
             />
             <ExportCard
               title="导出荣誉称号明细"
-              description="导出荣誉称号学生明细、材料说明和申报状态"
+              description="学生明细、材料和申报状态"
               disabled={exporting}
               onClick={() => handleExport('honorDeclarations')}
               icon="荣誉"
             />
             <ExportCard
               title="导出邮件记录"
-              description="导出邮件收件人、模板、状态和失败原因"
+              description="收件人、模板、状态和失败原因"
               disabled={exporting}
               onClick={() => handleExport('mailLogs')}
               icon="邮件"
             />
             <ExportCard
               title="导出账号列表"
-              description="导出所有班长账号信息（用户名、密码）"
+              description="班长账号信息"
               disabled={exporting}
               onClick={() => handleExport('accounts')}
               icon="账号"

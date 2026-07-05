@@ -19,6 +19,7 @@ interface AppShellProps {
   maxWidthClass: string;
   children: ReactNode;
   adminOnly?: boolean;
+  monitorOnly?: boolean;
   scope?: SystemScope;
 }
 
@@ -27,6 +28,7 @@ export default function AppShell({
   maxWidthClass,
   children,
   adminOnly = false,
+  monitorOnly = false,
   scope = 'shared',
 }: AppShellProps) {
   const [ready, setReady] = useState(false);
@@ -50,12 +52,16 @@ export default function AppShell({
       navigateTo('/entry', { replace: true });
       return;
     }
+    if (monitorOnly && user?.role !== 'monitor') {
+      navigateTo('/entry', { replace: true });
+      return;
+    }
 
     setReady(true);
-  }, [adminOnly]);
+  }, [adminOnly, monitorOnly]);
 
   if (!ready) {
-    return <ScreenState label="页面加载中..." fullScreen />;
+    return <ScreenState label="页面加载中" fullScreen />;
   }
 
   return (
@@ -79,7 +85,7 @@ export default function AppShell({
             <GuidePrompt
               guides={[guideForScope]}
               onOpen={setGuide}
-              title="进入系统前请先查看操作指南"
+              title="操作指南"
               description={system.guideDescription}
               className="mb-5"
             />
@@ -95,20 +101,20 @@ export default function AppShell({
 const systemCopy: Record<SystemScope, { label: string; description: string; badge: string; guideDescription: string }> = {
   evaluation: {
     label: '综合素质测评填写系统',
-    description: '处理学生基础信息、综测分数、数据导入导出和综测评审确认，申报相关页面从独立入口进入。',
+    description: '学生信息、综测分数、数据导入、附件导出和评审确认。',
     badge: '综测系统',
-    guideDescription: '本指南覆盖综测数据准备、模板导入、班级填报、分数核对、审核确认和签名材料导出。',
+    guideDescription: '综测数据准备、模板导入、班级填报、分数核对和材料导出。',
   },
   declaration: {
     label: '奖学金与荣誉称号申报系统',
-    description: '处理候选名单、班级申报、确认协议、管理员审核、邮件通知和操作记录。',
+    description: '候选名单、班级申报、确认协议、审核、邮件和日志。',
     badge: '申报系统',
-    guideDescription: '本指南覆盖申报补充信息、外部奖项名单、奖学金与荣誉称号申请、管理员审核和附件2导出。',
+    guideDescription: '申报补充信息、外部奖项、奖学金、荣誉称号、审核和附件导出。',
   },
   shared: {
     label: '综测填写与申报系统',
-    description: '当前页面属于两个系统共用能力，入口页可切换不同业务范围。',
+    description: '共用页面。',
     badge: '共用页面',
-    guideDescription: '入口页提供综测系统和申报系统的分角色操作指南。',
+    guideDescription: '按角色查看综测和申报指南。',
   },
 };

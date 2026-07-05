@@ -36,7 +36,7 @@ export default class RouteErrorBoundary extends Component<
             页面加载失败
           </h1>
           <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
-            可能是页面资源刚更新，当前标签页仍在使用旧缓存。
+            页面资源已更新，刷新后重试。
           </p>
           <button
             type="button"

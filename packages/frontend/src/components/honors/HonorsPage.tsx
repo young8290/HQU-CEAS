@@ -97,7 +97,7 @@ export default function HonorsPage() {
   const cadreQuota = candidates[0]?.classHonorQuota || 1;
   const submitIssues = useMemo(() => {
     const issues: string[] = [];
-    if (!classId) issues.push('当前账号未绑定班级');
+    if (!classId) issues.push('账号未绑定班级');
     if (selectedRows.length === 0) issues.push('至少选择 1 名符合条件的学生');
     const missingChecklist = checklistItems('honor')
       .filter(([code]) => !checklist[code])
@@ -163,7 +163,7 @@ export default function HonorsPage() {
         imageData,
       });
       setSignatureFile(saved);
-      setMessage('班长确认协议签名已保存');
+      setMessage('签名已保存');
     } catch (error: any) {
       setMessage(error.message);
     }
@@ -189,7 +189,7 @@ export default function HonorsPage() {
         </div>
       )}
 
-      <DataPanel title="申报类型" description="优秀学生按条件申报，无名额限制；优秀学生干部区分班级推荐和学生会推荐。">
+      <DataPanel title="申报类型" description="优秀学生不限名额，优秀学生干部区分推荐来源。">
         <div className="flex flex-wrap gap-2">
           {HONOR_TYPES.map((item) => (
             <button
@@ -208,14 +208,14 @@ export default function HonorsPage() {
         </div>
         {honorType === 'excellent_cadre' && (
           <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
-            当前班级推荐名额 {cadreQuota} 人，已选择班级推荐 {classRecommendedCadres} 人；学生会推荐不占用班级名额。
+            班级推荐名额 {cadreQuota} 人，已选 {classRecommendedCadres} 人。学生会推荐不占用名额。
           </p>
         )}
       </DataPanel>
 
-      <DataPanel title="候选名单" description="申报级别为班级填报意见，管理员审核通过时确认最终获奖级别。">
+      <DataPanel title="候选名单" description="管理员审核时确认最终级别。">
         {loading ? (
-          <ScreenState label="候选名单加载中..." />
+          <ScreenState label="候选名单加载中" />
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
@@ -307,7 +307,7 @@ export default function HonorsPage() {
 
       <DataPanel
         title="班长确认项"
-        description="荣誉称号申报需要确认学生本人意愿和相关材料真实性。"
+        description="确认学生意愿和材料真实性。"
         actions={
           <button
             type="button"
@@ -323,7 +323,7 @@ export default function HonorsPage() {
         <Checklist type="honor" value={checklist} onChange={setChecklist} />
       </DataPanel>
 
-      <DataPanel title="班长确认协议" description="签名保存后，提交申报时生成并归档荣誉称号确认协议 PDF。">
+      <DataPanel title="班长确认协议" description="签名后生成确认协议 PDF。">
         <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
           <SignaturePad
             signerName={user?.displayName || user?.username || '班长'}
@@ -348,14 +348,14 @@ function SubmitGate({ issues }: { issues: string[] }) {
   if (issues.length === 0) {
     return (
       <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">
-        提交前检查已通过，可以提交班级荣誉称号申报。
+        申报材料已就绪。
       </div>
     );
   }
 
   return (
     <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300">
-      <p className="font-medium">提交前还需完成以下事项</p>
+      <p className="font-medium">待完成事项</p>
       <ol className="mt-2 list-decimal space-y-1 pl-5">
         {issues.map((issue) => (
           <li key={issue}>{issue}</li>
@@ -368,12 +368,12 @@ function SubmitGate({ issues }: { issues: string[] }) {
 function PdfState({ declaration }: { declaration: any }) {
   const pdf = declaration?.agreementSignatures?.[0]?.pdfFile;
   if (!pdf) {
-    return <p className="text-sm text-neutral-500">确认协议 PDF：未生成</p>;
+    return <p className="text-sm text-neutral-500">确认协议 PDF 未生成</p>;
   }
 
   return (
     <div className="rounded-lg border border-neutral-200 p-3 text-sm dark:border-neutral-800">
-      <p className="font-medium text-neutral-900 dark:text-white">确认协议 PDF 已归档</p>
+      <p className="font-medium text-neutral-900 dark:text-white">确认协议 PDF 已保存</p>
       <button
         type="button"
         onClick={() => api.download(`/pdf-materials/${pdf.id}/download`, `荣誉称号确认协议-${pdf.id}.pdf`)}

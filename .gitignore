@@ -1,20 +1,34 @@
+# 依赖
 node_modules/
+
+# 构建产物
 dist/
+*.tsbuildinfo
+.vite/
+.vite-temp/
+scripts/.guide-build/
+
+# 环境变量(示例文件保留)
 .env
 .env.*
 !.env.example
+
+# 数据库:默认忽略,但本仓库为私有仓库,显式保留业务数据库
 *.db
 *.sqlite
 *.sqlite3
+!packages/backend/prisma/dev.db
+!packages/backend/prisma/archive/*.db
+
+# 日志
+*.log
+.logs/
+
+# 编辑器与本地工具
+.vscode/
+.idea/
+.claude/
+
+# 操作系统
 .DS_Store
 Thumbs.db
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-.vite/
-.vite-temp/
-.prisma/
-scripts/.guide-build/
-.idea/
-.vscode/

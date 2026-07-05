@@ -112,11 +112,36 @@ export async function submitHonorDeclaration(data: {
     return created;
   });
 
+  const [academicYear, signer] = await Promise.all([
+    prisma.academicYear.findUnique({ where: { id: data.academicYearId } }),
+    prisma.user.findUnique({ where: { id: data.actorId } }),
+  ]);
+  const declarationStudents = data.studentSelections.map((selection) => {
+    const candidate = candidateMap.get(selection.studentId);
+    const recommendation = selection.recommendationSource
+      || String(selection.material?.recommendationSource || '')
+      || (data.honorType === 'excellent_cadre' ? '班级推荐' : '');
+    return {
+      name: candidate?.name ?? '',
+      studentNo: candidate?.studentNo ?? '',
+      recommendation: data.honorType === 'excellent_cadre' ? recommendation : '',
+    };
+  });
+
   const pdf = await generatePdfMaterial({
     pdfType: 'monitor_agreement',
     businessType: 'declaration_batch',
     businessId: batch.id,
-    context: { declarationType: 'honor', honorType: data.honorType, checklist: data.checklist },
+    context: {
+      declarationType: 'honor',
+      honorType: data.honorType,
+      className: candidates[0]?.className,
+      academicYear: academicYear?.name,
+      signerName: signer?.displayName || signer?.username,
+      signedAt: new Date().toISOString(),
+      students: declarationStudents,
+      confirmedItems: checklistItems.map((item) => item.label),
+    },
     generatedBy: data.actorId,
     signatureFileIds: [signatureFileId],
   });

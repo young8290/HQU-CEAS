@@ -148,7 +148,7 @@ export default function ScoreEditor({ classId, onBack }: Props) {
   }, 0);
 
   if (loading) {
-    return <div className="flex h-64 items-center justify-center text-neutral-400">加载分数数据中...</div>;
+    return <div className="flex h-64 items-center justify-center text-neutral-400">分数加载中</div>;
   }
 
   return (
@@ -166,7 +166,7 @@ export default function ScoreEditor({ classId, onBack }: Props) {
         </div>
         <div className="flex items-center gap-3">
           <div className="text-sm">
-            <span className="text-neutral-400">当前状态</span>
+            <span className="text-neutral-400">状态</span>
             <span className="ml-2 text-neutral-700 dark:text-neutral-200">
               {saveStatus === 'saved' ? `已保存 ${lastSaved}` : saveStatus === 'saving' ? '保存中' : saveStatus === 'error' ? '保存失败' : '就绪'}
             </span>
@@ -176,7 +176,7 @@ export default function ScoreEditor({ classId, onBack }: Props) {
           </div>
           <input
             type="text"
-            placeholder="搜索学生..."
+            placeholder="搜索学生"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="rounded-md border border-[#d8c9b8] bg-white px-3 py-1.5 text-sm text-neutral-950 focus:border-[#9a5b3d] focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -282,7 +282,7 @@ export default function ScoreEditor({ classId, onBack }: Props) {
           </tbody>
         </table>
 
-        {students.length === 0 && <div className="py-12 text-center text-neutral-400">该班级暂无学生数据</div>}
+        {students.length === 0 && <div className="py-12 text-center text-neutral-400">暂无学生数据</div>}
       </div>
 
       <div className="text-sm text-neutral-400">
@@ -337,7 +337,7 @@ export default function ScoreEditor({ classId, onBack }: Props) {
             </div>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-[#eee4d8] bg-white px-3 py-2 text-sm dark:border-neutral-800 dark:bg-neutral-950">
               <span className="text-neutral-500 dark:text-neutral-400">
-                当前合计：<strong className="text-neutral-900 dark:text-white">{detailTotal.toFixed(2)}</strong>
+                合计：<strong className="text-neutral-900 dark:text-white">{detailTotal.toFixed(2)}</strong>
                 {SCORE_RULES[editingRemark.category as keyof typeof SCORE_RULES]?.max !== null && (
                   <span>，满分 {SCORE_RULES[editingRemark.category as keyof typeof SCORE_RULES]?.max}</span>
                 )}
@@ -350,7 +350,7 @@ export default function ScoreEditor({ classId, onBack }: Props) {
                 onClick={() => setRemarkRows((prev) => [...prev, { itemName: '', itemScore: '' }].slice(0, 15))}
                 className="rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-sm text-neutral-700 hover:bg-[#f6f1e8] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
               >
-                新增一行
+                新增
               </button>
               <div className="flex gap-2">
                 <button
@@ -370,7 +370,7 @@ export default function ScoreEditor({ classId, onBack }: Props) {
                 </button>
               </div>
             </div>
-            {detailLoading && <p className="mt-3 text-xs text-neutral-500">正在处理明细...</p>}
+            {detailLoading && <p className="mt-3 text-xs text-neutral-500">明细处理中</p>}
           </div>
         </div>
       )}

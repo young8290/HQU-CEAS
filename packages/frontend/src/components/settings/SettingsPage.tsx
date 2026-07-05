@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
-import { getUser, clearAuth } from '../../lib/auth';
+import { getUser, clearAuth, roleLabel } from '../../lib/auth';
 import { navigateTo } from '../../lib/router';
 
 interface AcademicYear {
@@ -87,7 +87,7 @@ export default function SettingsPage() {
     setError('');
     try {
       await api.put('/auth/password', { oldPassword, newPassword });
-      setSuccessMsg('密码修改成功，请重新登录');
+      setSuccessMsg('密码已修改，重新登录');
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -111,14 +111,14 @@ export default function SettingsPage() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><div className="text-neutral-400">加载中...</div></div>;
+    return <div className="flex items-center justify-center h-64"><div className="text-neutral-400">加载中</div></div>;
   }
 
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-950 dark:text-white font-headings">系统设置</h1>
-        <p className="text-neutral-500 dark:text-neutral-400 mt-1">管理学年和账号安全</p>
+          <h1 className="text-2xl font-bold text-neutral-950 dark:text-white font-headings">系统设置</h1>
+        <p className="text-neutral-500 dark:text-neutral-400 mt-1">学年、开放状态和账号安全。</p>
       </div>
 
       {/* Messages */}
@@ -169,7 +169,7 @@ export default function SettingsPage() {
               </div>
             ))}
             {years.length === 0 && (
-              <div className="text-neutral-400 text-sm">暂无学年，请创建</div>
+              <div className="text-neutral-400 text-sm">暂无学年</div>
             )}
           </div>
 
@@ -288,7 +288,7 @@ export default function SettingsPage() {
           </div>
           <div className="flex justify-between py-2">
             <span className="text-neutral-500">角色</span>
-            <span className="text-neutral-950 dark:text-white">{user?.role === 'admin' ? '管理员' : '班长'}</span>
+            <span className="text-neutral-950 dark:text-white">{roleLabel(user?.role)}</span>
           </div>
         </div>
       </div>

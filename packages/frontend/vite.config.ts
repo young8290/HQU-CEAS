@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     host: true,
-    allowedHosts: ['zongce.youngspace.top'],
+    allowedHosts: ['zongce.youngspace.top', 'system.youngspace.top'],
     proxy: {
       '/api': 'http://localhost:4000',
       '/ws': {

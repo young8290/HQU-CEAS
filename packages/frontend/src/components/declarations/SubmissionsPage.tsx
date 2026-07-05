@@ -27,7 +27,7 @@ export default function SubmissionsPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold text-neutral-950 dark:text-white">提交记录</h1>
-        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">查看本班奖学金和荣誉称号申报状态、退回意见和学生明细。</p>
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">奖学金、荣誉称号申报状态和退回意见。</p>
       </header>
       {message && <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">{message}</div>}
       <div className="grid gap-5 lg:grid-cols-2">
@@ -48,7 +48,7 @@ function SubmissionCard({ title, data }: { title: string; data: any }) {
           {data.reviewOpinion && <p className="rounded-lg border border-neutral-200 p-3 text-sm dark:border-neutral-800">{data.reviewOpinion}</p>}
         </div>
       ) : (
-        <p className="text-sm text-neutral-500">暂无提交记录。</p>
+        <p className="text-sm text-neutral-500">暂无记录。</p>
       )}
     </DataPanel>
   );

@@ -175,7 +175,7 @@ export default function MonitorScoreReviewPage() {
       });
       setRecord(updated);
       setMembers(toMemberDrafts(updated.members || []));
-      setMessage('审核小组成员签名已保存');
+      setMessage('签名已保存');
     } catch (error: any) {
       setMessage(error.message);
     }
@@ -225,7 +225,7 @@ export default function MonitorScoreReviewPage() {
           lastLoginAt: result.invite.lastLoginAt,
         },
       }));
-      setMessage(`审核链接已生成并复制：${result.url}`);
+      setMessage(`审核链接已复制：${result.url}`);
     } catch (error: any) {
       setMessage(error.message);
     }
@@ -256,9 +256,9 @@ export default function MonitorScoreReviewPage() {
     setMembers(members.filter((_, itemIndex) => itemIndex !== index));
   }
 
-  if (loading) return <ScreenState label="综测评审加载中..." />;
+  if (loading) return <ScreenState label="综测评审加载中" />;
 
-  const savedMembersById = new Map((record?.members || []).map((member: any) => [member.id, member]));
+  const savedMembersById = new Map<number, any>((record?.members || []).map((member: any) => [member.id, member]));
   const reviewMemberCards = members
     .map((member, index) => {
       const savedMember = typeof member.id === 'number' ? savedMembersById.get(member.id) : null;
@@ -295,7 +295,7 @@ export default function MonitorScoreReviewPage() {
 
       <DataPanel
         title="综测审核小组成员"
-        description="班级端填写审核小组成员，保存后为每位成员生成独立认证链接，签名和审核状态同步到班级与管理员端。"
+        description="维护成员、审核链接和签名。"
         actions={(
           <button
             type="button"
@@ -397,7 +397,7 @@ export default function MonitorScoreReviewPage() {
                             : 'cursor-not-allowed bg-neutral-200 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400'
                         }`}
                       >
-                        {invite?.inviteStatus === 'active' ? '刷新审核链接' : '生成审核链接'}
+                        {invite?.inviteStatus === 'active' ? '刷新链接' : '生成链接'}
                       </button>
                       <button
                         type="button"
@@ -419,7 +419,7 @@ export default function MonitorScoreReviewPage() {
                         <p>过期时间：{invite?.expiresAt ? new Date(invite.expiresAt).toLocaleString() : '-'}</p>
                       </>
                     ) : (
-                      <p>保存成员后生成审核链接并采集签名。</p>
+                      <p>保存成员后生成链接并采集签名。</p>
                     )}
                   </div>
                   {canUseMemberActions ? (
@@ -431,7 +431,7 @@ export default function MonitorScoreReviewPage() {
                     </>
                   ) : (
                     <div className="rounded-md border border-[#ded6c8] bg-[#fffaf2] px-4 py-8 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900">
-                      保存成员后可采集签名
+                      保存成员后采集签名
                     </div>
                   )}
                 </div>
@@ -439,11 +439,11 @@ export default function MonitorScoreReviewPage() {
             })}
           </div>
         ) : (
-          <p className="text-sm text-neutral-500">保存审核小组成员后即可采集签名。</p>
+          <p className="text-sm text-neutral-500">保存成员后采集签名。</p>
         )}
       </DataPanel>
 
-      <DataPanel title="学生审核状态汇总" description="展示每名学生在审核小组中的核对进度；全部成员均已核对后，汇总状态才显示为已核对。">
+      <DataPanel title="学生审核状态汇总" description="按学生查看各成员核对进度。">
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <StatusChip label={`待审核 ${reviewStatusSummary.pending}`} tone="neutral" />
           <StatusChip label={`已核对 ${reviewStatusSummary.reviewed}`} tone="success" />
@@ -499,7 +499,7 @@ export default function MonitorScoreReviewPage() {
         </div>
       </DataPanel>
 
-      <DataPanel title="班级操作日志" description="展示本班综测评审邀请、登录、审核状态和签名记录。">
+      <DataPanel title="班级操作日志" description="邀请、登录、核对和签名记录。">
         <div className="max-h-[360px] overflow-y-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="bg-neutral-50 text-xs text-neutral-500 dark:bg-neutral-950">

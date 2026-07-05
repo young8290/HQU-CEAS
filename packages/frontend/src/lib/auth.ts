@@ -68,6 +68,13 @@ export function isAdmin(): boolean {
   return user?.role === 'admin';
 }
 
+// 角色显示名。short=true 用于侧边栏「XX端」这类紧凑标签。
+export function roleLabel(role: User['role'] | undefined, short = false): string {
+  if (role === 'admin') return short ? '管理员端' : '管理员';
+  if (role === 'reviewer') return short ? '审核端' : '审核成员';
+  return short ? '班长端' : '班长';
+}
+
 export function isLoggedIn(): boolean {
   return !!getToken();
 }

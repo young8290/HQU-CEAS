@@ -13,13 +13,13 @@ function getReviewDeviceId() {
 }
 
 export default function ReviewInviteLoginRoute() {
-  const [message, setMessage] = useState('正在校验评审链接...');
+  const [message, setMessage] = useState('审核链接校验中');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     if (!token) {
-      setMessage('评审链接缺少认证信息');
+      setMessage('审核链接缺少认证信息');
       return;
     }
     api.post('/score-review-invites/login', {
@@ -31,7 +31,7 @@ export default function ReviewInviteLoginRoute() {
         navigateTo('/review/scores', { replace: true });
       })
       .catch((error) => {
-        setMessage(error.message || '评审链接校验失败');
+        setMessage(error.message || '审核链接校验失败');
       });
   }, []);
 

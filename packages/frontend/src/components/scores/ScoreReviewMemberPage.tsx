@@ -4,7 +4,7 @@ import StatusChip from '../common/StatusChip';
 import SignaturePad from '../signature/SignaturePad';
 import SignatureUpload from '../signature/SignatureUpload';
 import { reviewApi } from '../../lib/api';
-import { clearReviewAuth, getReviewUser } from '../../lib/auth';
+import { clearReviewAuth, getReviewUser, isReviewLoggedIn } from '../../lib/auth';
 import { navigateTo } from '../../lib/router';
 import { reviewWsClient } from '../../lib/ws';
 import { EVALUATION_SCORE_CATEGORIES_ORDER, SCORE_RULES, supportsScoreDetails } from '../../lib/validation';
@@ -52,6 +52,10 @@ export default function ScoreReviewMemberPage() {
   const [activeDetail, setActiveDetail] = useState<{ student: any; category: string } | null>(null);
 
   async function loadSession() {
+    if (!isReviewLoggedIn()) {
+      navigateTo('/review-login', { replace: true });
+      return;
+    }
     try {
       const data = await reviewApi.get('/score-review-invites/session', { forceRefresh: true });
       setSession(data);
@@ -171,7 +175,7 @@ export default function ScoreReviewMemberPage() {
     navigateTo('/review-login', { replace: true });
   }
 
-  if (loading) return <ScreenState label="评审页面加载中..." />;
+  if (loading) return <ScreenState label="评审页面加载中" />;
   if (!session) {
     return (
       <main className="min-h-screen bg-[#f7f3eb] p-6 dark:bg-neutral-950">
@@ -195,7 +199,7 @@ export default function ScoreReviewMemberPage() {
             <div>
               <p className="text-sm text-neutral-500 dark:text-neutral-400">{session.class?.grade?.name || ''}{session.class?.name || ''}</p>
               <h1 className="mt-1 text-2xl font-semibold">综测评审核对</h1>
-              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">当前成员：{session.member.name}</p>
+              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">成员：{session.member.name}</p>
             </div>
             <div className="grid grid-cols-3 gap-2 text-center sm:min-w-[360px]">
               <div className="rounded-md border border-[#eee4d8] bg-[#fffaf2] px-3 py-2 dark:border-neutral-800 dark:bg-neutral-950">
@@ -400,7 +404,7 @@ export default function ScoreReviewMemberPage() {
                 </div>
               ) : (
                 <div className="rounded-md border border-[#d8c9b8] bg-white px-4 py-8 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:bg-neutral-950">
-                  该分数暂无加分明细
+                  暂无加分明细
                 </div>
               )}
             </div>

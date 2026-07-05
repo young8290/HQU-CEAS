@@ -58,11 +58,11 @@ export default function MailPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold text-neutral-950 dark:text-white">邮箱配置与发送记录</h1>
-        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">配置学术部网易邮箱 SMTP 授权码，查看发送状态并重发失败记录。</p>
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">SMTP 配置、发送记录和失败重发。</p>
       </header>
       {message && <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">{message}</div>}
       <div className="grid gap-6 xl:grid-cols-[420px_1fr]">
-        <DataPanel title="SMTP 配置" description={settings?.configured ? `当前账号：${settings.username}` : '尚未配置邮箱'}>
+        <DataPanel title="SMTP 配置" description={settings?.configured ? `账号：${settings.username}` : '尚未配置'}>
           <div className="space-y-3">
             <Input label="SMTP 主机" value={form.smtpHost} onChange={(value) => setForm({ ...form, smtpHost: value })} />
             <Input label="端口" value={String(form.smtpPort)} onChange={(value) => setForm({ ...form, smtpPort: Number(value) })} />

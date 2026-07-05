@@ -64,8 +64,8 @@ interface GuidePromptProps {
 export function GuidePrompt({
   guides,
   onOpen,
-  title = '首次使用前请先查看操作指南',
-  description = '指南按管理员和班长分别制作，覆盖数据准备、模板下载、导入顺序、班级填报、审核确认和材料导出。',
+  title = '操作指南',
+  description = '按角色查看数据准备、班级填报、审核确认和材料导出。',
   eyebrow = '操作指南',
   className = '',
 }: GuidePromptProps) {
@@ -109,7 +109,7 @@ export function GuidePreview({ guide, onClose }: { guide: GuideItem; onClose: ()
       <section className="mx-auto flex h-full max-w-6xl flex-col overflow-hidden rounded-lg border border-[#ded6c8] bg-[#fffdf8] shadow-[0_24px_80px_rgba(40,32,24,0.22)] dark:border-neutral-800 dark:bg-neutral-900">
         <header className="flex flex-col gap-3 border-b border-[#e4d8ca] px-5 py-4 dark:border-neutral-800 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#9a5b3d] dark:text-primary-300">PDF 预览</p>
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#9a5b3d] dark:text-primary-300">PDF</p>
             <h2 className="mt-1 text-lg font-semibold text-neutral-950 dark:text-white">{guide.title}</h2>
           </div>
           <div className="flex flex-wrap gap-2">

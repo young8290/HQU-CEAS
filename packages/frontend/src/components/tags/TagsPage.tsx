@@ -45,7 +45,7 @@ export default function TagsPage() {
     <div className="space-y-6">
       {message && <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">{message}</div>}
 
-      <DataPanel title="查看方式" description="支持查看全部标签、按班级查看和按奖项查看。">
+      <DataPanel title="查看方式" description="按标签、班级或奖项查看。">
         <div className="flex flex-wrap gap-2">
           {[
             { value: 'all', label: '全部' },
@@ -108,7 +108,7 @@ export default function TagsPage() {
 
       <DataPanel title="标签列表">
         {tags.length === 0 ? (
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">暂无标签数据。</p>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">暂无标签。</p>
         ) : (
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {tags.map((tag) => (

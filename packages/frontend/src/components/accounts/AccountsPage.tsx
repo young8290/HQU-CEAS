@@ -83,7 +83,7 @@ export default function AccountsPage() {
       setGenerateResult(result);
       setShowGenerate(false);
       const created = Array.isArray(result) ? result.filter((r: any) => r.status !== '跳过').length : 0;
-      setSuccessMsg(`成功处理 ${Array.isArray(result) ? result.length : 0} 个班长账号，其中新建/重置 ${created} 个`);
+      setSuccessMsg(`班长账号处理完成：共 ${Array.isArray(result) ? result.length : 0} 个，新建/重置 ${created} 个`);
       await loadUsers();
       setTimeout(() => setSuccessMsg(''), 8000);
     } catch (err: any) {
@@ -95,7 +95,7 @@ export default function AccountsPage() {
 
   const handleCreateAdmin = async () => {
     if (!adminUsername || !adminPassword) {
-      setError('请填写用户名和密码');
+      setError('用户名和密码不能为空');
       return;
     }
     setCreatingAdmin(true);
@@ -125,7 +125,7 @@ export default function AccountsPage() {
     if (!confirm(`确定要重置 ${username} 的密码吗？`)) return;
     try {
       const result = await api.post(`/users/${userId}/reset-password`, {});
-      setSuccessMsg(`密码已重置为: ${result.newPassword}`);
+      setSuccessMsg(`新密码：${result.newPassword}`);
       setTimeout(() => setSuccessMsg(''), 10000);
     } catch (err: any) {
       setError(err.message || '重置失败');
@@ -147,7 +147,7 @@ export default function AccountsPage() {
   const handleExportAccounts = async () => {
     try {
       await api.download('/export/accounts', '账号列表.xlsx');
-      setSuccessMsg('导出成功');
+      setSuccessMsg('已导出');
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err: any) {
       setError(err.message || '导出失败');
@@ -174,7 +174,7 @@ export default function AccountsPage() {
       a.download = `班长账号_含密码_${new Date().toISOString().slice(0, 10)}.xlsx`;
       a.click();
       URL.revokeObjectURL(url);
-      setSuccessMsg('导出成功（含密码）');
+      setSuccessMsg('已导出含密码账号');
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err: any) {
       setError(err.message || '导出失败');
@@ -194,7 +194,7 @@ export default function AccountsPage() {
 
   const handleSendMonitorAccounts = async () => {
     if (!generateResult?.length) {
-      setError('请先批量生成班长账号，再发送账号邮件');
+      setError('先生成班长账号，再发送账号邮件');
       return;
     }
 
@@ -206,7 +206,7 @@ export default function AccountsPage() {
       const sentCount = Array.isArray(result) ? result.filter((item: any) => item.status === 'sent').length : 0;
       const failedCount = Array.isArray(result) ? result.filter((item: any) => item.status === 'failed').length : 0;
       const totalCount = Array.isArray(result) ? result.length : 0;
-      setSuccessMsg(`账号邮件发送记录 ${totalCount} 条，发送成功 ${sentCount} 条，发送失败 ${failedCount} 条`);
+      setSuccessMsg(`账号邮件：共 ${totalCount} 条，成功 ${sentCount} 条，失败 ${failedCount} 条`);
       setTimeout(() => setSuccessMsg(''), 5000);
     } catch (err: any) {
       setError(err.message || '账号邮件发送失败');
@@ -214,7 +214,7 @@ export default function AccountsPage() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><div className="text-neutral-400">加载中...</div></div>;
+    return <div className="flex items-center justify-center h-64"><div className="text-neutral-400">加载中</div></div>;
   }
 
   const admins = users.filter((u) => u.role === 'admin');
@@ -225,7 +225,7 @@ export default function AccountsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-neutral-950 dark:text-white font-headings">账号管理</h1>
-          <p className="text-neutral-500 dark:text-neutral-400 mt-1">管理管理员和班长账号</p>
+          <p className="text-neutral-500 dark:text-neutral-400 mt-1">管理员与班长账号。</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -278,7 +278,7 @@ export default function AccountsPage() {
                 onClick={handleExportGenerateResult}
                 className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white transition-colors hover:bg-[#7c4a34]"
               >
-                导出为Excel（含密码）
+                导出 Excel（含密码）
               </button>
               <button
                 onClick={() => setGenerateResult(null)}
@@ -290,7 +290,7 @@ export default function AccountsPage() {
           </div>
           <div className="overflow-hidden rounded-lg border border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950">
             <div className="px-4 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs">
-              请及时导出或记录密码，关闭后密码将不再显示
+              关闭后不再显示密码
             </div>
             <table className="w-full text-sm">
               <thead>
@@ -440,7 +440,7 @@ export default function AccountsPage() {
           <div className="w-96 rounded-lg border border-[#ded6c8] bg-[#fffaf2] p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-neutral-950 dark:text-white font-headings mb-4">批量生成班长账号</h3>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">
-              为选定年级下的每个班级自动生成一个班长账号。用户名格式: monitor_年级_班级名。生成后会显示随机密码，请及时导出保存。
+              为每个班级生成一个班长账号，用户名格式：monitor_年级_班级名。
             </p>
             <div className="mb-4">
               <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">选择年级</label>
@@ -462,7 +462,7 @@ export default function AccountsPage() {
                 disabled={generating}
                 className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34] disabled:opacity-50"
               >
-                {generating ? '生成中...' : '开始生成'}
+                {generating ? '生成中' : '生成'}
               </button>
             </div>
           </div>
@@ -481,7 +481,7 @@ export default function AccountsPage() {
                   type="text"
                   value={adminUsername}
                   onChange={(e) => setAdminUsername(e.target.value)}
-                  placeholder="请输入用户名"
+                  placeholder="用户名"
                   className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
@@ -491,7 +491,7 @@ export default function AccountsPage() {
                   type="password"
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
-                  placeholder="请输入密码"
+                  placeholder="密码"
                   className="w-full rounded-md border border-[#d8c9b8] bg-white px-3 py-2 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-[#ead9c7] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
@@ -513,7 +513,7 @@ export default function AccountsPage() {
                 disabled={creatingAdmin || !adminUsername || !adminPassword}
                 className="rounded-md bg-[#9a5b3d] px-4 py-2 text-sm text-white hover:bg-[#7c4a34] disabled:opacity-50"
               >
-                {creatingAdmin ? '创建中...' : '创建'}
+                {creatingAdmin ? '创建中' : '创建'}
               </button>
             </div>
           </div>

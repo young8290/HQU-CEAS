@@ -35,7 +35,7 @@ export default function MailTemplatePage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold text-neutral-950 dark:text-white">邮件模板</h1>
-        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">维护班长账号通知、密码重置、申报开放和审核退回邮件内容。</p>
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">账号通知、密码重置、申报开放和审核退回。</p>
       </header>
       {message && <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">{message}</div>}
       <div className="grid gap-6 xl:grid-cols-[1fr_460px]">
@@ -62,7 +62,7 @@ export default function MailTemplatePage() {
               <p className="text-xs text-neutral-500">可用变量：{JSON.parse(editing.variablesJson || '[]').join('、')}</p>
             </div>
           ) : (
-            <p className="text-sm text-neutral-500">请选择左侧模板。</p>
+            <p className="text-sm text-neutral-500">选择模板后编辑。</p>
           )}
         </DataPanel>
       </div>

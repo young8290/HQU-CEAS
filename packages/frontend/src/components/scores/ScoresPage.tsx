@@ -70,7 +70,7 @@ export default function ScoresPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-neutral-400">加载中...</div>
+        <div className="text-neutral-400">加载中</div>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export default function ScoresPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-neutral-950 dark:text-white font-headings">分数填写</h1>
-        <p className="text-neutral-500 dark:text-neutral-400 mt-1">请选择年级和班级进入分数编辑</p>
+        <p className="text-neutral-500 dark:text-neutral-400 mt-1">选择年级和班级后编辑分数</p>
       </div>
 
       {/* Grade Selection */}
