@@ -13,12 +13,17 @@ scripts/.guide-build/
 .env.*
 !.env.example
 
-# 数据库:默认忽略,但本仓库为私有仓库,显式保留业务数据库
+# 数据库:默认忽略;随仓库仅分发干净种子库 dev.db(admin/admin123),业务数据不入库
 *.db
 *.sqlite
 *.sqlite3
+*.db-shm
+*.db-wal
+*.db.bak*
 !packages/backend/prisma/dev.db
-!packages/backend/prisma/archive/*.db
+
+# 本地工具产物
+.playwright-mcp/
 
 # 日志
 *.log

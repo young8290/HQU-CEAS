@@ -4,21 +4,22 @@ import { clearAuth, clearReviewAuth, getReviewToken, getToken } from './auth';
 const API_BASE = '/api';
 const CACHE_STORAGE_PREFIX = 'api-cache:';
 
+// 缓存规则匹配 v2 双系统前缀：/platform、/evaluation、/declaration。
 const CACHE_RULES = [
-  { pattern: /^\/academic-years$/, ttl: 5 * 60 * 1000 },
-  { pattern: /^\/grades$/, ttl: 5 * 60 * 1000 },
-  { pattern: /^\/grades\/\d+\/classes$/, ttl: 5 * 60 * 1000 },
-  { pattern: /^\/users$/, ttl: 60 * 1000 },
-  { pattern: /^\/students\?classId=\d+$/, ttl: 30 * 1000 },
-  { pattern: /^\/import\/logs$/, ttl: 20 * 1000 },
-  { pattern: /^\/system\/entry-status$/, ttl: 15 * 1000 },
-  { pattern: /^\/templates$/, ttl: 5 * 60 * 1000 },
-  { pattern: /^\/awards\/candidates\/\d+/, ttl: 30 * 1000 },
-  { pattern: /^\/awards\/allocation\/\d+/, ttl: 30 * 1000 },
-  { pattern: /^\/honors\/candidates\/\d+/, ttl: 30 * 1000 },
-  { pattern: /^\/declaration-reviews/, ttl: 15 * 1000 },
-  { pattern: /^\/mail\/templates$/, ttl: 5 * 60 * 1000 },
-  { pattern: /^\/tags/, ttl: 30 * 1000 },
+  { pattern: /^\/platform\/academic-years$/, ttl: 5 * 60 * 1000 },
+  { pattern: /^\/platform\/grades$/, ttl: 5 * 60 * 1000 },
+  { pattern: /^\/platform\/grades\/\d+\/classes$/, ttl: 5 * 60 * 1000 },
+  { pattern: /^\/platform\/users$/, ttl: 60 * 1000 },
+  { pattern: /^\/platform\/students\?classId=\d+$/, ttl: 30 * 1000 },
+  { pattern: /^\/evaluation\/import\/logs$/, ttl: 20 * 1000 },
+  { pattern: /^\/platform\/system\/entry-status$/, ttl: 15 * 1000 },
+  { pattern: /^\/evaluation\/templates$/, ttl: 5 * 60 * 1000 },
+  { pattern: /^\/declaration\/awards\/candidates\/\d+/, ttl: 30 * 1000 },
+  { pattern: /^\/declaration\/awards\/allocation\/\d+/, ttl: 30 * 1000 },
+  { pattern: /^\/declaration\/honors\/candidates\/\d+/, ttl: 30 * 1000 },
+  { pattern: /^\/declaration\/declaration-reviews/, ttl: 15 * 1000 },
+  { pattern: /^\/platform\/mail\/templates$/, ttl: 5 * 60 * 1000 },
+  { pattern: /^\/declaration\/tags/, ttl: 30 * 1000 },
 ] as const;
 
 const memoryCache = new Map<string, { data: any; expiresAt: number }>();
@@ -168,7 +169,7 @@ async function request<T = any>(path: string, options: RequestOptions = {}): Pro
       } catch {}
 
       // Only redirect to login for non-login requests (token expired)
-      if (!path.startsWith('/auth/login') && !path.startsWith('/score-review-invites/login')) {
+      if (!path.startsWith('/platform/auth/login') && !path.startsWith('/evaluation/score-review-invites/login')) {
         if (authScope === 'review') {
           clearReviewAuth();
           clearApiCache();

@@ -87,6 +87,7 @@ model Student {
   declarationSupplements DeclarationSupplement[]
   tags Tag[]
   scoreReviewStudentChecks ScoreReviewStudentCheck[]
+  nationalScholarshipCandidates NationalScholarshipCandidate[]
 
   @@map("students")
 }
@@ -106,6 +107,7 @@ model AcademicYear {
   declarationSupplements DeclarationSupplement[]
   scoreReviewRecords ScoreReviewRecord[]
   tags Tag[]
+  nationalScholarshipEvaluations NationalScholarshipEvaluation[]
 
   @@map("academic_years")
 }
@@ -126,6 +128,8 @@ model Score {
   bonusDetails  ScoreBonusDetail[]
 
   @@unique([studentId, academicYearId, category])
+  // 排名/汇总高频谓词（PLAN_V2 §5.5）；由编排者统一 db push 落库
+  @@index([academicYearId, category])
   @@map("scores")
 }
 
@@ -563,4 +567,61 @@ model SystemSetting {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("system_settings")
+}
+
+// 国家奖学金评定（PDF《关于国家奖学金评定办法的完善方案》附录 A 四算法）——纯增量模块
+model NationalScholarshipEvaluation {
+  id             Int      @id @default(autoincrement())
+  academicYearId Int      @map("academic_year_id")
+  name           String                                  // 评比单元名称，如"2023级计算机科学与技术（合组）"
+  classIdsJson   String   @map("class_ids_json")          // JSON number[]：参与合组的班级
+  quota          Int      @default(0)                     // Q 下达名额
+  poolRatio      Float    @default(0.1) @map("pool_ratio")// p 入池比例
+  paramW         Float    @default(0.5) @map("param_w")   // 按班授课学分占比
+  paramD         Float    @default(1.0) @map("param_d")   // 单科给分松紧折算绩点的最大差异
+  analyticB      Float?   @map("analytic_b")              // B_解析 = w·d
+  empiricalB     Float?   @map("empirical_b")             // B_经验 = median|Δ(q)|
+  effectiveB     Float?   @map("effective_b")             // B = min
+  status         String   @default("draft")               // draft | computed | finalized
+  note           String?
+  createdBy      Int?     @map("created_by")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  academicYear AcademicYear                   @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  candidates   NationalScholarshipCandidate[]
+
+  @@index([academicYearId])
+  @@map("national_scholarship_evaluations")
+}
+
+model NationalScholarshipCandidate {
+  id                  Int      @id @default(autoincrement())
+  evaluationId        Int      @map("evaluation_id")
+  studentId           Int      @map("student_id")
+  classId             Int      @map("class_id")
+  gpa                 Float                                  // g 快照：academic/8 − 2.5
+  totalScore          Float    @map("total_score")          // z 快照：综测总分
+  gRank               Int      @map("g_rank")               // 专业绩点名次（并列同名次）
+  zRank               Int      @map("z_rank")               // 专业综测名次
+  isClassRecommended  Boolean  @default(false) @map("is_class_recommended") // L_i
+  hasMajorAchievement Boolean  @default(false) @map("has_major_achievement")// M_i
+  inPool              Boolean  @default(false) @map("in_pool")
+  poolReasonsJson     String   @default("[]") @map("pool_reasons_json")     // JSON string[]：入池来源
+  dominatedByCount    Int      @default(0) @map("dominated_by_count")       // 被多少人稳健占优
+  robustRank          Int?     @map("robust_rank")          // 稳健层名次 = 被占优数 + 1
+  isCritical          Boolean  @default(false) @map("is_critical")          // 临界层
+  achievements        String?                                // 主要成果清单（人工）
+  reviewNote          String?  @map("review_note")           // 临界比较记录 / 书面理由（留痕）
+  finalRank           Int?     @map("final_rank")
+  selected            Boolean  @default(false)               // 是否入选推荐名单
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  evaluation NationalScholarshipEvaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  student    Student                       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([evaluationId, studentId])
+  @@index([evaluationId])
+  @@index([studentId])
+  @@map("national_scholarship_candidates")
 }

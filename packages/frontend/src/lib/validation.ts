@@ -18,10 +18,13 @@ export const SCORE_RULES: Record<string, { label: string; max: number | null; ed
 };
 
 // Check if a category is editable for a given role
-export function isCategoryEditable(category: string, role: string): boolean {
+// allowAdminEditing: 系统设置「允许管理员修改分数」开关（默认 true 保持兼容）；
+// 关闭时管理员一律不可编辑，monitor 不受影响。
+export function isCategoryEditable(category: string, role: string, allowAdminEditing: boolean = true): boolean {
   const rule = SCORE_RULES[category];
   if (!rule) return false;
   if (rule.editableBy === 'none') return false;
+  if (role === 'admin' && allowAdminEditing === false) return false;
   if (rule.editableBy === 'admin') return role === 'admin';
   return true; // 'all'
 }

@@ -1,0 +1,161 @@
+import { type ReactNode, useEffect, useState } from 'react';
+import { getUser, isLoggedIn } from '../lib/auth';
+import { AppLink, navigateTo, useCurrentPath } from '../lib/router';
+import { usePageMeta } from '../lib/usePageMeta';
+import {
+  getGuideByRoleAndScope,
+  getGuideRole,
+  GuidePreview,
+  GuidePrompt,
+  type GuideItem,
+} from '../components/ui/OperationGuide';
+import ScreenState from '../components/ui/ScreenState';
+import Sidebar from './Sidebar';
+
+export type SystemScope = 'evaluation' | 'declaration' | 'shared';
+
+const GUIDE_BANNER_KEY = 'guideBannerDismissed';
+
+interface AppShellProps {
+  title: string;
+  maxWidthClass: string;
+  children: ReactNode;
+  adminOnly?: boolean;
+  monitorOnly?: boolean;
+  scope?: SystemScope;
+}
+
+export default function AppShell({
+  title,
+  maxWidthClass,
+  children,
+  adminOnly = false,
+  monitorOnly = false,
+  scope = 'shared',
+}: AppShellProps) {
+  const [ready, setReady] = useState(false);
+  const [guide, setGuide] = useState<GuideItem | null>(null);
+  const [showGuideBanner, setShowGuideBanner] = useState(false);
+  const currentPath = useCurrentPath();
+  const pageTitle = title.split(' - ')[0];
+  const system = systemCopy[scope];
+  const user = ready ? getUser() : null;
+  const role = getGuideRole(user?.role);
+  const guideForScope = scope === 'shared' ? undefined : getGuideByRoleAndScope(role, scope);
+
+  usePageMeta(title);
+
+  useEffect(() => {
+    if (!isLoggedIn()) {
+      navigateTo('/login', { replace: true });
+      return;
+    }
+
+    const user = getUser();
+    if (adminOnly && user?.role !== 'admin') {
+      navigateTo('/entry', { replace: true });
+      return;
+    }
+    if (monitorOnly && user?.role !== 'monitor') {
+      navigateTo('/entry', { replace: true });
+      return;
+    }
+
+    setReady(true);
+    // 首次访问引导横幅：localStorage 记忆，关闭后不再出现。
+    try {
+      setShowGuideBanner(localStorage.getItem(GUIDE_BANNER_KEY) !== '1');
+    } catch {
+      setShowGuideBanner(false);
+    }
+  }, [adminOnly, monitorOnly]);
+
+  const dismissGuideBanner = () => {
+    try {
+      localStorage.setItem(GUIDE_BANNER_KEY, '1');
+    } catch {
+      // Ignore storage failures.
+    }
+    setShowGuideBanner(false);
+  };
+
+  if (!ready) {
+    return <ScreenState label="页面加载中" fullScreen />;
+  }
+
+  return (
+    <div className="flex min-h-screen bg-[#f6f1e8] text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+      <Sidebar scope={scope} />
+      <main className="flex-1 overflow-auto">
+        <div className={`mx-auto w-full px-5 py-6 lg:px-8 lg:py-7 ${maxWidthClass}`}>
+          {showGuideBanner && currentPath !== '/guide' && (
+            <div className="mb-5 flex flex-col gap-3 rounded-lg border border-[#d8c9b8] bg-[#fff4e3] px-4 py-3 dark:border-neutral-700 dark:bg-neutral-900 md:flex-row md:items-center md:justify-between">
+              <p className="text-sm leading-6 text-[#7c4a34] dark:text-primary-300">
+                第一次使用本系统？「新手指引」按角色列出第一步到最后一步该去哪个页面、点什么。
+              </p>
+              <div className="flex shrink-0 items-center gap-2">
+                <AppLink
+                  to="/guide"
+                  className="rounded-md bg-[#9a5b3d] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#7c4a34]"
+                >
+                  查看新手指引
+                </AppLink>
+                <button
+                  type="button"
+                  onClick={dismissGuideBanner}
+                  className="rounded-md border border-[#d8c9b8] bg-white px-3 py-1.5 text-xs text-neutral-600 transition-colors hover:bg-[#f6f1e8] dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-300"
+                >
+                  不再提示
+                </button>
+              </div>
+            </div>
+          )}
+          <header className="mb-5 border-b border-[#ded6c8] pb-5 dark:border-neutral-800">
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-xs font-medium text-[#9a5b3d] dark:text-primary-300">{system.label}</p>
+                <h1 className="mt-1 text-2xl font-semibold tracking-normal text-neutral-950 dark:text-white">{pageTitle}</h1>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-neutral-600 dark:text-neutral-300">{system.description}</p>
+              </div>
+              <span className="inline-flex w-fit rounded-md border border-[#d9c8b8] bg-[#fffaf2] px-3 py-1.5 text-xs font-medium text-[#7c4a34] dark:border-neutral-700 dark:bg-neutral-900 dark:text-primary-300">
+                {system.badge}
+              </span>
+            </div>
+          </header>
+          {guideForScope && (
+            <GuidePrompt
+              guides={[guideForScope]}
+              onOpen={setGuide}
+              title="操作指南"
+              description={system.guideDescription}
+              className="mb-5"
+            />
+          )}
+          {children}
+        </div>
+      </main>
+      {guide && <GuidePreview guide={guide} onClose={() => setGuide(null)} />}
+    </div>
+  );
+}
+
+const systemCopy: Record<SystemScope, { label: string; description: string; badge: string; guideDescription: string }> = {
+  evaluation: {
+    label: '综合素质测评填写系统',
+    description: '学生信息、综测分数、数据导入、附件导出和评审确认。',
+    badge: '综测系统',
+    guideDescription: '综测数据准备、模板导入、班级填报、分数核对和材料导出。',
+  },
+  declaration: {
+    label: '奖学金与荣誉称号申报系统',
+    description: '候选名单、班级申报、确认协议、审核、邮件和日志。',
+    badge: '申报系统',
+    guideDescription: '申报补充信息、外部奖项、奖学金、荣誉称号、审核和附件导出。',
+  },
+  shared: {
+    label: '综测填写与申报系统',
+    description: '共用页面。',
+    badge: '共用页面',
+    guideDescription: '按角色查看综测和申报指南。',
+  },
+};

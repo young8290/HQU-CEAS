@@ -2,6 +2,13 @@
 setlocal EnableExtensions
 chcp 65001 >nul
 
+rem ============================================================================
+rem  【开发模式】启动脚本：vite dev(3000) + 后端 dev(4000) + cloudflared。
+rem  仅限本机开发调试。公网部署请用 start-prod.bat（生产单源：Express 在 4000
+rem  同时服务前端构建产物 + API + WS，隧道只指向 4000，静态资源带缓存头，
+rem  且强制校验 JWT_SECRET）。把 vite dev server 暴露到公网是错误架构。
+rem ============================================================================
+
 set "ROOT_DIR=%~dp0"
 set "TUNNEL_LOG=%ROOT_DIR%.logs\cloudflared.log"
 if not exist "%ROOT_DIR%.logs" mkdir "%ROOT_DIR%.logs"
