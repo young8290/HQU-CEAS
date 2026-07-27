@@ -58,6 +58,12 @@ export default function ScoreReviewMemberPage() {
       return;
     }
     try {
+      const status = await reviewApi.get('/platform/system/entry-status', { forceRefresh: true });
+      if (status.entryStatus?.comprehensiveEvalOpen !== true) {
+        setSession(null);
+        setMessage('综测系统当前关闭');
+        return;
+      }
       const data = await reviewApi.get('/evaluation/score-review-invites/session', { forceRefresh: true });
       setSession(data);
       setChecks(data.checks || {});
@@ -147,6 +153,7 @@ export default function ScoreReviewMemberPage() {
       }));
       setAggregate((prev) => ({ ...prev, [studentId]: result.aggregate }));
     } catch (error: any) {
+      await loadSession();
       setMessage(error.message);
     }
   }

@@ -124,19 +124,14 @@ const roleGuides: RoleGuide[] = [
 
 export default function GuidePage() {
   const user = getUser();
-  // 当前角色的指引置顶展示，其余角色仍可查阅。
-  const orderedGuides = [...roleGuides].sort((a, b) => {
-    const aOwn = a.role === user?.role ? 0 : 1;
-    const bOwn = b.role === user?.role ? 0 : 1;
-    return aOwn - bOwn;
-  });
+  const visibleGuides = roleGuides.filter((guide) => guide.role === user?.role);
 
   return (
     <div className="space-y-6">
-      {orderedGuides.map((guide) => (
+      {visibleGuides.map((guide) => (
         <DataPanel
           key={guide.role}
-          title={guide.role === user?.role ? `${guide.title}（我的角色）` : guide.title}
+          title={guide.title}
           description={guide.description}
         >
           <ol className="space-y-3">

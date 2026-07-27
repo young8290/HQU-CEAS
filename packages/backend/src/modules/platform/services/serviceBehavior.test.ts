@@ -4,7 +4,7 @@ import prisma from '../../../core/db.js';
 import { updateMailSettings, getActiveMailConfig } from './mailConfigService.js';
 import { sendMonitorAccountMails } from './userService.js';
 import { approveDeclaration } from '../../declaration/services/declarationReviewService.js';
-import { getEntryStatus, updateEntryStatus, listSystemSettings } from './systemSettingService.js';
+import { assertSystemWriteOpen, getEntryStatus, updateEntryStatus, listSystemSettings } from './systemSettingService.js';
 import { cacheService } from '../../../core/cache.js';
 import { replaceMethod } from '../../../core/utils/testUtils.js';
 
@@ -153,6 +153,51 @@ test('getEntryStatus fills allowAdminScoreEditing=false for legacy stored settin
     assert.equal(status.declarationCloseReason, '窗口期已结束');
   } finally {
     restores.reverse().forEach((restore) => restore());
+    cacheService.clear('systemStatus');
+  }
+});
+
+test('assertSystemWriteOpen lets admins manage a closed evaluation system', async () => {
+  cacheService.clear('systemStatus');
+  let settingQueried = false;
+  const restore = replaceMethod(prisma.systemSetting, 'findUnique', async () => {
+    settingQueried = true;
+    return {
+      id: 6102,
+      key: 'system.entryStatus',
+      valueJson: JSON.stringify({ comprehensiveEvalOpen: false, declarationOpen: false }),
+    };
+  });
+
+  try {
+    await assert.doesNotReject(() => assertSystemWriteOpen('evaluation', 'admin'));
+    assert.equal(settingQueried, false);
+  } finally {
+    restore();
+    cacheService.clear('systemStatus');
+  }
+});
+
+test('assertSystemWriteOpen rejects non-admin writes for the closed system scope', async () => {
+  cacheService.clear('systemStatus');
+  const restore = replaceMethod(prisma.systemSetting, 'findUnique', async () => ({
+    id: 6103,
+    key: 'system.entryStatus',
+    valueJson: JSON.stringify({ comprehensiveEvalOpen: false, declarationOpen: false }),
+  }));
+
+  try {
+    await assert.rejects(
+      () => assertSystemWriteOpen('evaluation', 'monitor'),
+      /综测系统当前关闭/,
+    );
+    cacheService.clear('systemStatus');
+    await assert.rejects(
+      () => assertSystemWriteOpen('declaration', 'monitor'),
+      /申报系统当前关闭/,
+    );
+  } finally {
+    restore();
     cacheService.clear('systemStatus');
   }
 });

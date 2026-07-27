@@ -11,6 +11,7 @@ import {
 } from '../components/ui/OperationGuide';
 import ScreenState from '../components/ui/ScreenState';
 import Sidebar from './Sidebar';
+import { api } from '../lib/api';
 
 export type SystemScope = 'evaluation' | 'declaration' | 'shared';
 
@@ -46,29 +47,57 @@ export default function AppShell({
   usePageMeta(title);
 
   useEffect(() => {
-    if (!isLoggedIn()) {
-      navigateTo('/login', { replace: true });
-      return;
+    let cancelled = false;
+    setReady(false);
+
+    async function guardRoute() {
+      if (!isLoggedIn()) {
+        navigateTo('/login', { replace: true });
+        return;
+      }
+
+      const currentUser = getUser();
+      if (adminOnly && currentUser?.role !== 'admin') {
+        navigateTo('/entry', { replace: true });
+        return;
+      }
+      if (monitorOnly && currentUser?.role !== 'monitor') {
+        navigateTo('/entry', { replace: true });
+        return;
+      }
+
+      if (scope !== 'shared' && currentUser?.role === 'monitor') {
+        try {
+          const data = await api.get('/platform/system/entry-status', { forceRefresh: true });
+          const entryStatus = data.entryStatus;
+          const systemOpen = scope === 'evaluation'
+            ? entryStatus?.comprehensiveEvalOpen === true
+            : entryStatus?.declarationOpen === true;
+          if (cancelled) return;
+          if (!systemOpen) {
+            navigateTo('/entry', { replace: true });
+            return;
+          }
+        } catch {
+          // 后端写入闸门仍是最终权限边界；状态查询失败时保留只读页面可用性。
+        }
+      }
+
+      if (cancelled) return;
+      setReady(true);
+      // 首次访问引导横幅：localStorage 记忆，关闭后不再出现。
+      try {
+        setShowGuideBanner(localStorage.getItem(GUIDE_BANNER_KEY) !== '1');
+      } catch {
+        setShowGuideBanner(false);
+      }
     }
 
-    const user = getUser();
-    if (adminOnly && user?.role !== 'admin') {
-      navigateTo('/entry', { replace: true });
-      return;
-    }
-    if (monitorOnly && user?.role !== 'monitor') {
-      navigateTo('/entry', { replace: true });
-      return;
-    }
-
-    setReady(true);
-    // 首次访问引导横幅：localStorage 记忆，关闭后不再出现。
-    try {
-      setShowGuideBanner(localStorage.getItem(GUIDE_BANNER_KEY) !== '1');
-    } catch {
-      setShowGuideBanner(false);
-    }
-  }, [adminOnly, monitorOnly]);
+    void guardRoute();
+    return () => {
+      cancelled = true;
+    };
+  }, [adminOnly, monitorOnly, scope]);
 
   const dismissGuideBanner = () => {
     try {

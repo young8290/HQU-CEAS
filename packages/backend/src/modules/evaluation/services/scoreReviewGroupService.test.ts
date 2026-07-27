@@ -1,8 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import prisma from '../../../core/db.js';
-import { saveScoreReviewMembers } from './scoreReviewGroupService.js';
+import { saveScoreReviewMembers, signScoreReviewMember } from './scoreReviewGroupService.js';
+import { cacheService } from '../../../core/cache.js';
 import { replaceMethod } from '../../../core/utils/testUtils.js';
+
+function closedEntryStatusSetting() {
+  return {
+    id: 6201,
+    key: 'system.entryStatus',
+    valueJson: JSON.stringify({
+      comprehensiveEvalOpen: false,
+      declarationOpen: true,
+      declarationCloseReason: '',
+    }),
+  };
+}
 
 test('saveScoreReviewMembers keeps saved member ids for existing invites', async () => {
   const signedAt = new Date('2026-06-26T00:00:00.000Z');
@@ -41,7 +54,10 @@ test('saveScoreReviewMembers keeps saved member ids for existing invites', async
       signatureFile: null,
     },
   ];
+  cacheService.clear('systemStatus');
   const restores = [
+    // 综测开关取默认值（开启），保证既有保存流程不受新增闸门影响
+    replaceMethod(prisma.systemSetting, 'findUnique', async () => null),
     replaceMethod(prisma.scoreReviewRecord, 'upsert', async () => ({ ...record, members: [...members] })),
     replaceMethod(prisma.scoreReviewRecord, 'update', async ({ data }: any) => ({ ...record, ...data })),
     replaceMethod(prisma.scoreReviewGroupMember, 'deleteMany', async ({ where }: any) => {
@@ -89,5 +105,62 @@ test('saveScoreReviewMembers keeps saved member ids for existing invites', async
     assert.equal(result.members[2].name, 'Study Member');
   } finally {
     restores.reverse().forEach((restore) => restore());
+    cacheService.clear('systemStatus');
+  }
+});
+
+test('saveScoreReviewMembers rejects writes when comprehensive evaluation system is closed', async () => {
+  cacheService.clear('systemStatus');
+  let recordTouched = false;
+  const restores = [
+    replaceMethod(prisma.systemSetting, 'findUnique', async () => closedEntryStatusSetting()),
+    replaceMethod(prisma.scoreReviewRecord, 'upsert', async () => {
+      recordTouched = true;
+      throw new Error('should_not_touch_record');
+    }),
+  ];
+
+  try {
+    await assert.rejects(
+      () => saveScoreReviewMembers({
+        academicYearId: 2026,
+        classId: 12,
+        actorId: 1,
+        members: [{ name: '班长', roleName: '班长' }],
+      }),
+      /综测系统当前关闭/,
+    );
+    assert.equal(recordTouched, false);
+  } finally {
+    restores.reverse().forEach((restore) => restore());
+    cacheService.clear('systemStatus');
+  }
+});
+
+test('signScoreReviewMember rejects signing when comprehensive evaluation system is closed', async () => {
+  cacheService.clear('systemStatus');
+  let memberQueried = false;
+  const restores = [
+    replaceMethod(prisma.systemSetting, 'findUnique', async () => closedEntryStatusSetting()),
+    replaceMethod(prisma.scoreReviewGroupMember, 'findFirst', async () => {
+      memberQueried = true;
+      return null;
+    }),
+  ];
+
+  try {
+    await assert.rejects(
+      () => signScoreReviewMember({
+        recordId: 41,
+        memberId: 51,
+        signatureFileId: 901,
+        actorId: 1,
+      }),
+      /综测系统当前关闭/,
+    );
+    assert.equal(memberQueried, false);
+  } finally {
+    restores.reverse().forEach((restore) => restore());
+    cacheService.clear('systemStatus');
   }
 });

@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import prisma from '../../../core/db.js';
-import { getScoresByClass, saveScoreBonusDetails } from './scoreService.js';
+import { getScoresByClass, saveScoreBonusDetails, isMonitorEvalWriteBlocked } from './scoreService.js';
+import { cacheService } from '../../../core/cache.js';
 import { replaceMethod } from '../../../core/utils/testUtils.js';
 
 test('getScoresByClass returns bonus details with score cells', async () => {
@@ -167,5 +168,45 @@ test('saveScoreBonusDetails keeps additive semantics for non-moral categories', 
     assert.equal(laborUpsert.update.remark, '2条加分明细');
   } finally {
     mock.restore();
+  }
+});
+
+test('isMonitorEvalWriteBlocked rejects monitor score writes when comprehensive evaluation system is closed', async () => {
+  cacheService.clear('systemStatus');
+  const restores = [
+    replaceMethod(prisma.systemSetting, 'findUnique', async () => ({
+      id: 6201,
+      key: 'system.entryStatus',
+      valueJson: JSON.stringify({
+        comprehensiveEvalOpen: false,
+        declarationOpen: true,
+        declarationCloseReason: '',
+      }),
+    })),
+  ];
+
+  try {
+    // 班长（monitor）的交互式写入被拦截（REST PUT /、明细保存、总分重算与 WS score:update 共用此闸）
+    assert.equal(await isMonitorEvalWriteBlocked('monitor'), true);
+    // 管理员的管理操作/批量导入不受综测开关影响（与申报侧口径一致）
+    assert.equal(await isMonitorEvalWriteBlocked('admin'), false);
+  } finally {
+    restores.reverse().forEach((restore) => restore());
+    cacheService.clear('systemStatus');
+  }
+});
+
+test('isMonitorEvalWriteBlocked allows monitor score writes while comprehensive evaluation system is open', async () => {
+  cacheService.clear('systemStatus');
+  const restores = [
+    // 未配置系统设置时取默认值：comprehensiveEvalOpen = true
+    replaceMethod(prisma.systemSetting, 'findUnique', async () => null),
+  ];
+
+  try {
+    assert.equal(await isMonitorEvalWriteBlocked('monitor'), false);
+  } finally {
+    restores.reverse().forEach((restore) => restore());
+    cacheService.clear('systemStatus');
   }
 });

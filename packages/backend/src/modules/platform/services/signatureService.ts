@@ -1,6 +1,7 @@
 import prisma from '../../../core/db.js';
 import { saveStoredFile } from './fileStorageService.js';
 import { recordAuditLog } from './auditService.js';
+import { assertSystemWriteOpen } from './systemSettingService.js';
 
 function decodeDataUrl(dataUrl: string) {
   const match = dataUrl.match(/^data:(.+);base64,(.+)$/);
@@ -10,13 +11,26 @@ function decodeDataUrl(dataUrl: string) {
   return { mimeType: match[1], buffer: Buffer.from(match[2], 'base64') };
 }
 
+export async function assertSignatureUploadAllowed(purpose: string, role?: string) {
+  if (role === 'admin') return;
+  if (purpose === 'score_review_confirmation') {
+    await assertSystemWriteOpen('evaluation', role);
+  } else if (purpose === 'monitor_agreement') {
+    await assertSystemWriteOpen('declaration', role);
+  } else {
+    throw new Error('invalid_signature_purpose');
+  }
+}
+
 export async function saveSignature(data: {
   signerName: string;
   method: 'draw' | 'upload';
   purpose: string;
   imageData: string;
   createdBy?: number;
+  actorRole?: string;
 }) {
+  await assertSignatureUploadAllowed(data.purpose, data.actorRole);
   const { mimeType, buffer } = decodeDataUrl(data.imageData);
   const storedFile = await saveStoredFile({
     buffer,

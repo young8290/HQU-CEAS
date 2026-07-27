@@ -32,6 +32,7 @@ router.put('/:classId/members', monitorClassCheck, async (req: Request, res: Res
       classId: parseInt(req.params.classId as string),
       members: req.body.members || [],
       actorId: req.user!.userId,
+      actorRole: req.user!.role,
     }));
   } catch (err: any) {
     res.status(400).json({ error: err.message });
@@ -47,6 +48,7 @@ router.post('/:classId/signatures', monitorClassCheck, async (req: Request, res:
       memberId: parseInt(req.body.memberId),
       signatureFileId: parseInt(req.body.signatureFileId),
       actorId: req.user!.userId,
+      actorRole: req.user!.role,
       auditContext: {
         academicYearId,
         classId,
