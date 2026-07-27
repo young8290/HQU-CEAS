@@ -146,6 +146,11 @@ export function setupWebSocket(server: Server) {
                 ws.send(JSON.stringify({ type: 'score:error', studentId, category, error: 'permission_denied' }));
                 return;
               }
+              // 综测系统关闭后，班长不可再写入分数（与 REST 入口一致）
+              if (await scoreService.isMonitorEvalWriteBlocked(ws.user!.role)) {
+                ws.send(JSON.stringify({ type: 'score:error', studentId, category, error: '综测系统当前关闭' }));
+                return;
+              }
               await scoreService.assertStudentInClass(parseInt(studentId), ws.user!.classId);
             }
 

@@ -2,6 +2,7 @@ import prisma from '../../../core/db.js';
 import { cacheService } from '../../../core/cache.js';
 import { generatePdfMaterial } from '../../platform/services/pdfService.js';
 import { recordAuditLog } from '../../platform/services/auditService.js';
+import { assertSystemWriteOpen } from '../../platform/services/systemSettingService.js';
 
 const DEFAULT_SCORE_REVIEW_MEMBERS = [
   { name: '班长', roleName: '班长' },
@@ -61,7 +62,9 @@ export async function saveScoreReviewMembers(data: {
   classId: number;
   members: Array<{ id?: number; name: string; roleName?: string | null }>;
   actorId?: number;
+  actorRole?: string;
 }) {
+  await assertSystemWriteOpen('evaluation', data.actorRole);
   if (data.members.length === 0) {
     throw new Error('审核小组成员不能为空');
   }
@@ -123,11 +126,13 @@ export async function signScoreReviewMember(data: {
   memberId: number;
   signatureFileId: number;
   actorId?: number;
+  actorRole?: string;
   auditContext?: {
     academicYearId?: number;
     classId?: number;
   };
 }) {
+  await assertSystemWriteOpen('evaluation', data.actorRole);
   const existingMember = await prisma.scoreReviewGroupMember.findFirst({
     where: { id: data.memberId, recordId: data.recordId },
   });

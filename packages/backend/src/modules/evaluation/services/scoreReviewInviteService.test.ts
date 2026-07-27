@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import prisma from '../../../core/db.js';
 import { getClassReviewChecks, loginByInvite, updateStudentCheck } from './scoreReviewInviteService.js';
+import { cacheService } from '../../../core/cache.js';
 import { replaceMethod } from '../../../core/utils/testUtils.js';
 
 function sha256(value: string) {
@@ -66,7 +67,10 @@ test('updateStudentCheck writes reviewer check and scoped audit log', async () =
   let auditData: any = null;
   let upsertData: any = null;
   const invite = activeInvite();
+  cacheService.clear('systemStatus');
   const restores = [
+    // 综测开关取默认值（开启），保证既有确认流程不受新增闸门影响
+    replaceMethod(prisma.systemSetting, 'findUnique', async () => null),
     replaceMethod(prisma.scoreReviewMemberInvite, 'findFirst', async () => ({
       ...invite,
       member: { ...invite.member, signatureFile: null },
@@ -112,6 +116,49 @@ test('updateStudentCheck writes reviewer check and scoped audit log', async () =
     assert.equal(auditData.action, 'student_check_updated');
   } finally {
     restores.reverse().forEach((restore) => restore());
+    cacheService.clear('systemStatus');
+  }
+});
+
+test('updateStudentCheck rejects reviewer confirmation when comprehensive evaluation system is closed', async () => {
+  cacheService.clear('systemStatus');
+  let inviteQueried = false;
+  const restores = [
+    replaceMethod(prisma.systemSetting, 'findUnique', async () => ({
+      id: 6201,
+      key: 'system.entryStatus',
+      valueJson: JSON.stringify({
+        comprehensiveEvalOpen: false,
+        declarationOpen: true,
+        declarationCloseReason: '',
+      }),
+    })),
+    replaceMethod(prisma.scoreReviewMemberInvite, 'findFirst', async () => {
+      inviteQueried = true;
+      return null;
+    }),
+  ];
+
+  try {
+    await assert.rejects(
+      () => updateStudentCheck({
+        payload: {
+          userId: 61,
+          username: 'reviewer_12_51',
+          role: 'reviewer',
+          classId: 12,
+          reviewInviteId: 31,
+          reviewMemberId: 51,
+        },
+        studentId: 101,
+        status: 'reviewed',
+      }),
+      /综测系统当前关闭/,
+    );
+    assert.equal(inviteQueried, false);
+  } finally {
+    restores.reverse().forEach((restore) => restore());
+    cacheService.clear('systemStatus');
   }
 });
 

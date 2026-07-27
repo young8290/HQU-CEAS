@@ -17,6 +17,7 @@ router.post('/', async (req: Request, res: Response) => {
       purpose: req.body.purpose,
       imageData: req.body.imageData,
       createdBy: req.user!.userId,
+      actorRole: req.user!.role,
     }));
   } catch (err: any) {
     res.status(400).json({ error: err.message });

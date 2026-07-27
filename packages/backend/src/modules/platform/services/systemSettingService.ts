@@ -12,6 +12,8 @@ export interface EntryStatus {
   allowAdminScoreEditing: boolean;
 }
 
+export type SystemWriteScope = 'evaluation' | 'declaration';
+
 const defaultEntryStatus: EntryStatus = {
   comprehensiveEvalOpen: true,
   declarationOpen: true,
@@ -34,6 +36,17 @@ export async function getEntryStatus(): Promise<EntryStatus> {
     // 合并默认值，保证历史存量 JSON 缺少新增字段（如 allowAdminScoreEditing）时取默认值。
     return { ...defaultEntryStatus, ...parseSetting(setting?.valueJson, defaultEntryStatus) };
   });
+}
+
+export async function assertSystemWriteOpen(scope: SystemWriteScope, role?: string) {
+  if (role === 'admin') return;
+  const entryStatus = await getEntryStatus();
+  if (scope === 'evaluation' && !entryStatus.comprehensiveEvalOpen) {
+    throw new Error('综测系统当前关闭');
+  }
+  if (scope === 'declaration' && !entryStatus.declarationOpen) {
+    throw new Error('申报系统当前关闭');
+  }
 }
 
 export async function updateEntryStatus(data: Partial<EntryStatus>, actorId?: number) {

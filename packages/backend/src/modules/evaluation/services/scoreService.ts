@@ -1,5 +1,6 @@
 import prisma from '../../../core/db.js';
 import type { Prisma } from '@prisma/client';
+import { getEntryStatus } from '../../platform/services/systemSettingService.js';
 import {
   EVALUATION_SCORE_CATEGORIES_ORDER,
   PERSONAL_FORM_DETAIL_CATEGORIES,
@@ -181,6 +182,19 @@ export async function getScoreBonusDetails(data: {
     itemScore: item.itemScore,
     sortOrder: item.sortOrder,
   }));
+}
+
+/**
+ * 综测系统开关（comprehensiveEvalOpen）：关闭后班长（monitor）不可再写入综测数据，
+ * 拦截口径与申报系统 declarationOpen（'申报系统当前关闭'）一致。
+ * 管理员的管理操作与批量导入不受影响，因此不放进 updateScore/saveScoreBonusDetails
+ * 内部（它们被 importService 复用），而是供交互式入口（REST/WS）在调用前判定，
+ * 处理方式同 routes/scores.ts 中 allowAdminScoreEditing 的闸。
+ */
+export async function isMonitorEvalWriteBlocked(role: string): Promise<boolean> {
+  if (role !== 'monitor') return false;
+  const entryStatus = await getEntryStatus();
+  return !entryStatus.comprehensiveEvalOpen;
 }
 
 export async function assertStudentInClass(studentId: number, classId: number) {

@@ -83,13 +83,15 @@ interface NavItem {
 
 interface NavGroup {
   label: string;
+  scope?: SystemScope; // 分组所属系统；不设或设 'shared' 表示跨系统常驻（平台组）。
   items: NavItem[];
 }
 
-// 侧边栏按【综测系统｜申报系统｜平台】三组分组，href 全部使用 v2 新路径前缀。
+// 侧边栏按【综测系统｜申报系统｜平台】三组分组，href 全部使用 v2 新路径前缀；按当前 scope 过滤展示。
 const navGroups: NavGroup[] = [
   {
     label: '综测系统',
+    scope: 'evaluation',
     items: [
       { name: '综测总览', href: '/evaluation/dashboard', icon: <IconDashboard />, adminOnly: true },
       { name: '本班综测总览', href: '/evaluation/class/dashboard', icon: <IconDashboard />, monitorOnly: true },
@@ -103,6 +105,7 @@ const navGroups: NavGroup[] = [
   },
   {
     label: '申报系统',
+    scope: 'declaration',
     items: [
       { name: '申报审核', href: '/declaration/reviews', icon: <IconDeclaration />, adminOnly: true },
       { name: '国家奖学金', href: '/declaration/national-scholarship', icon: <IconDeclaration />, adminOnly: true },
@@ -142,8 +145,9 @@ export default function Sidebar({ scope }: { scope: SystemScope }) {
     setUser(u);
   }, []);
 
-  // 角色过滤（admin/monitor 门禁语义不变）；分组常驻展示，让"我在哪个系统"一目了然。
+  // 角色过滤（admin/monitor 门禁语义不变）；各 scope 只显示本系统分组与跨系统常驻的平台组。
   const visibleGroups = navGroups
+    .filter((group) => !group.scope || group.scope === 'shared' || group.scope === scope)
     .map((group) => ({
       ...group,
       items: group.items.filter((item) => {

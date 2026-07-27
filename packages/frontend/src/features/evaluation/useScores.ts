@@ -23,6 +23,11 @@ export interface StudentScore {
   details?: Record<string, ScoreDetailData[]>;
 }
 
+interface LoadScoresOptions {
+  preserveSaveError?: boolean;
+  silent?: boolean;
+}
+
 export function useScores(classId: number | null) {
   const [students, setStudents] = useState<StudentScore[]>([]);
   const [loading, setLoading] = useState(false);
@@ -32,17 +37,17 @@ export function useScores(classId: number | null) {
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   // Load scores
-  const loadScores = useCallback(async () => {
+  const loadScores = useCallback(async (options: LoadScoresOptions = {}) => {
     if (!classId) return;
-    setLoading(true);
-    setSaveError(null);
+    if (!options.silent) setLoading(true);
+    if (!options.preserveSaveError) setSaveError(null);
     try {
-      const data = await api.get(`/evaluation/scores/class/${classId}`);
+      const data = await api.get(`/evaluation/scores/class/${classId}`, { forceRefresh: true });
       setStudents(data);
     } catch (err) {
       console.error('Failed to load scores:', err);
     } finally {
-      setLoading(false);
+      if (!options.silent) setLoading(false);
     }
   }, [classId]);
 
@@ -94,6 +99,7 @@ export function useScores(classId: number | null) {
     const handleError = (data: any) => {
       setSaveStatus('error');
       setSaveError(data.error || '保存失败');
+      void loadScores({ preserveSaveError: true, silent: true });
       console.error('Score save error:', data.error);
     };
 
@@ -107,7 +113,7 @@ export function useScores(classId: number | null) {
       wsClient.off('score:error', handleError);
       wsClient.disconnect();
     };
-  }, [classId]);
+  }, [classId, loadScores]);
 
   // Update a score with debounce
   const updateScore = useCallback(
@@ -161,6 +167,7 @@ export function useScores(classId: number | null) {
           } catch (error: any) {
             setSaveStatus('error');
             setSaveError(error.message || '保存失败');
+            await loadScores({ preserveSaveError: true, silent: true });
           } finally {
             debounceTimers.current.delete(key);
           }
@@ -169,7 +176,7 @@ export function useScores(classId: number | null) {
 
       return null;
     },
-    []
+    [loadScores]
   );
 
   const updateRemark = useCallback(

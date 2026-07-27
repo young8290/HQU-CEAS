@@ -3,6 +3,7 @@ import prisma from '../../../core/db.js';
 import { generateToken, type TokenPayload } from '../../../core/utils/token.js';
 import { hashPassword } from '../../../core/utils/password.js';
 import { recordAuditLog, listAuditLogs } from '../../platform/services/auditService.js';
+import { assertSystemWriteOpen } from '../../platform/services/systemSettingService.js';
 import { getOrCreateScoreReviewRecord, signScoreReviewMember } from './scoreReviewGroupService.js';
 import { getScoresByClass, assertStudentInClass } from './scoreService.js';
 
@@ -367,6 +368,7 @@ export async function updateStudentCheck(data: {
   status: string;
   remark?: string | null;
 }) {
+  await assertSystemWriteOpen('evaluation', data.payload.role);
   if (!CHECK_STATUSES.has(data.status)) throw new Error('invalid_check_status');
   const invite = await assertReviewerInvite(data.payload);
   await assertStudentInClass(data.studentId, invite.record.classId);
@@ -419,6 +421,7 @@ export async function bindReviewerSignature(data: {
     memberId: invite.memberId,
     signatureFileId: data.signatureFileId,
     actorId: data.payload.userId,
+    actorRole: data.payload.role,
     auditContext: {
       academicYearId: invite.record.academicYearId,
       classId: invite.record.classId,

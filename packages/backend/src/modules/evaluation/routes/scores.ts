@@ -19,6 +19,10 @@ async function isAdminScoreEditingBlocked(role: string): Promise<boolean> {
   return allowAdminScoreEditing === false;
 }
 
+// 综测系统开关：管理员关闭后，班长（monitor）不可再写入本班综测数据（口径同申报系统 declarationOpen）。
+// 同样只拦交互式入口，不进 scoreService，避免影响管理员批量导入/管理操作。
+const COMPREHENSIVE_EVAL_CLOSED_MSG = '综测系统当前关闭';
+
 // Get scores by class
 router.get('/class/:classId', monitorClassCheck, async (req: Request, res: Response) => {
   try {
@@ -118,6 +122,10 @@ router.put('/', async (req: Request, res: Response) => {
       res.status(403).json({ error: ADMIN_SCORE_EDITING_DISABLED_MSG });
       return;
     }
+    if (await scoreService.isMonitorEvalWriteBlocked(req.user!.role)) {
+      res.status(403).json({ error: COMPREHENSIVE_EVAL_CLOSED_MSG });
+      return;
+    }
     const { studentId, category, value, remark, academicYearId } = req.body;
 
     // Role-based editability check
@@ -175,6 +183,10 @@ router.put('/student/:studentId/:category/details', async (req: Request, res: Re
       res.status(403).json({ error: ADMIN_SCORE_EDITING_DISABLED_MSG });
       return;
     }
+    if (await scoreService.isMonitorEvalWriteBlocked(req.user!.role)) {
+      res.status(403).json({ error: COMPREHENSIVE_EVAL_CLOSED_MSG });
+      return;
+    }
     const studentId = parseInt(req.params.studentId as string);
     const category = req.params.category as ScoreCategory;
     if (req.user!.role === 'monitor') {
@@ -209,6 +221,10 @@ router.put('/student/:studentId/:category/details', async (req: Request, res: Re
 // Calculate total and sort
 router.post('/calculate-total/:classId', monitorClassCheck, async (req: Request, res: Response) => {
   try {
+    if (await scoreService.isMonitorEvalWriteBlocked(req.user!.role)) {
+      res.status(403).json({ error: COMPREHENSIVE_EVAL_CLOSED_MSG });
+      return;
+    }
     const classId = parseInt(req.params.classId as string);
     let academicYearId = parseInt(req.body.academicYearId) || 0;
     
